@@ -1,5 +1,6 @@
 // src/pages/Loginpage.jsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // useNavigate 훅을 임포트
 import GuestBackGround from '../components/GuestBackGround'; // GuestBackGround 컴포넌트 임포트
 import loginimg from '../assets/loginimg.png';
 
@@ -49,7 +50,7 @@ function Loginpage(props) {
             htmlFor="website-admin"
             className="block mb-2 text-sm font-medium"
           >
-            Username
+            Password
           </label>
           <div className="flex mb-6">
             <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">
@@ -67,7 +68,7 @@ function Loginpage(props) {
               type="text"
               id="website-admin"
               className="rounded-none rounded-e-lg bg-white border text-black focus:ring-blue-500 focus:border-blue-500 block w-[500px] text-sm border-gray-300 p-2.5 dark:bg-white dark:border-gray-300 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="name"
+              placeholder="Password"
             />
           </div>
           <button className="mt-15 text-center p-4 bg-primary-darkblue text-white rounded mt-20 w-[540px] h-[40px] flex items-center justify-center">
