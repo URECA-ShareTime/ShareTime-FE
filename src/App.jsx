@@ -9,8 +9,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Enterpage />} /> {/* Enterpage로 경로 설정 */}
-      <Route path="/login" element={<Loginpage />} />{' '}
-      <Route path="/signup" element={<Signuppage />} />{' '}
+      <Route path="user/login" element={<Loginpage />} />{' '}
+      <Route path="user/signup" element={<Signuppage />} />{' '}
     </Routes>
   );
 }

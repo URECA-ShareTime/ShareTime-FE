@@ -43,13 +43,13 @@ function Welcome({ navigate }) {
         만들어보세요!
       </p>
       <button
-        onClick={() => navigate('/signup')} // Sign up 버튼 클릭 시 이동
+        onClick={() => navigate('/user/signup')} // Sign up 버튼 클릭 시 이동
         className="text-center p-4 bg-primary-darkblue text-white rounded mt-8 w-[300px] h-[40px] flex items-center justify-center"
       >
         Sign up
       </button>
       <button
-        onClick={() => navigate('/login')} // Sign in 버튼 클릭 시 로그인 페이지로 이동
+        onClick={() => navigate('/user/login')} // Sign in 버튼 클릭 시 로그인 페이지로 이동
         className="text-center p-4 bg-primary-white text-primary-darkblue mt-2 w-[300px] h-[40px] flex items-center justify-center"
       >
         Sign in
