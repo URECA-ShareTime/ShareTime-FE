@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'; // useNavigate 훅을 임포트
 import GuestBackGround from '../components/GuestBackGround'; // GuestBackGround 컴포넌트 임포트
 import loginimg from '../assets/loginimg.png';
 
-function Loginpage(props) {
+function LoginPage(props) {
   return (
     <div className="relative">
       <GuestBackGround />
@@ -92,4 +92,4 @@ function Loginpage(props) {
   );
 }
 
-export default Loginpage;
+export default LoginPage;

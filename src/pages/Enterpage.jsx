@@ -5,7 +5,7 @@ import GuestBackGround from '../components/GuestBackGround';
 import enterletter from '../assets/enterletter.png';
 import sittingman from '../assets/sittingman.png';
 
-function Enterpage(props) {
+function EnterPage(props) {
   const navigate = useNavigate(); // 페이지 이동을 위한 navigate 함수 생성
 
   return (
@@ -58,4 +58,4 @@ function Welcome({ navigate }) {
   );
 }
 
-export default Enterpage;
+export default EnterPage;

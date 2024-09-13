@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'; // useNavigate 훅을 임포트
 import GuestBackGround from '../components/GuestBackGround';
 import profileimage from '../assets/profileimage.png';
 
-function Signuppage(props) {
+function SignUpPage(props) {
   const navigate = useNavigate(); // 페이지 이동을 위한 navigate 함수 생성
   const [selectedImage, setSelectedImage] = useState(profileimage); // 초기 프로필 이미지를 기본 이미지로 설정
 
@@ -179,4 +179,4 @@ function Signuppage(props) {
   );
 }
 
-export default Signuppage;
+export default SignUpPage;
