@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+const withMT = require("@material-tailwind/react/utils/withMT");
+
+module.exports = withMT({
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -10,7 +12,11 @@ module.exports = {
           darkblue: '#3F6886',
         },
       },
+      height: {
+        header : '80px',
+        content: 'calc(100vh - 80px)',
+      }
     },
   },
   plugins: [],
-};
+});

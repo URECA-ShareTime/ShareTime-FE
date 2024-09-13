@@ -4,7 +4,7 @@ import GuestBackGround from '../components/GuestBackGround';
 import profileimage from '../assets/profileimage.png';
 import axios from 'axios';
 
-function Signuppage() {
+function SignUpPage() {
   const navigate = useNavigate();
   const [profile_picture, setProfile_picture] = useState(null); // 초기값을 null로 설정하여 기본 이미지 제거
   const [formData, setFormData] = useState({
@@ -14,7 +14,6 @@ function Signuppage() {
     password: '',
   });
   const [error, setError] = useState('');
-
   // 이미지 파일 선택 핸들러
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -212,4 +211,4 @@ function Signuppage() {
   );
 }
 
-export default Signuppage;
+export default SignUpPage;

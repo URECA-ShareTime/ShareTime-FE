@@ -39,6 +39,7 @@ function Loginpage() {
     }
   };
 
+function LoginPage(props) {
   return (
     <div className="relative">
       <GuestBackGround />
@@ -104,4 +105,4 @@ function Loginpage() {
   );
 }
 
-export default Loginpage;
+export default LoginPage;
