@@ -52,6 +52,7 @@ export default function LeftBarAccordion({
       <Accordion
         open={activeIdx === id}
         icon={<AccordionIcon id={id} open={activeIdx} />}
+        className='w-[130px]'
       >
           <AccordionHeader onClick={() => handleActiveIdx(id)} className='text-base border-b-white text-white'>
             {title}

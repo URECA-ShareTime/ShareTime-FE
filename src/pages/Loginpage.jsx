@@ -5,7 +5,7 @@ import GuestBackGround from '../components/GuestBackGround'; // GuestBackGround 
 import loginimg from '../assets/loginimg.png';
 import axios from 'axios';
 
-function Loginpage() {
+function LoginPage() {
   const navigate = useNavigate(); // 페이지 이동을 위한 navigate 함수 생성
   const [formData, setFormData] = useState({
     email: '',
@@ -37,9 +37,8 @@ function Loginpage() {
       console.error('로그인 오류:', error);
       setError('로그인에 실패했습니다. 다시 시도해주세요.');
     }
-  };
+  }
 
-function LoginPage(props) {
   return (
     <div className="relative">
       <GuestBackGround />
@@ -48,7 +47,7 @@ function LoginPage(props) {
           Login now
         </p>
         <p className="text-left ml-20 mt-2 text-sm font-normal text-black">
-          Hi, Welcomeback :)
+          Hi, Welcomeback :
         </p>
       </div>
       <div className="flex flex-row ml-20 absolute top-60">
