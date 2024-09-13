@@ -1,18 +1,104 @@
-// src/pages/Signuppage.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // useNavigate 훅을 임포트
+import { useNavigate } from 'react-router-dom';
 import GuestBackGround from '../components/GuestBackGround';
 import profileimage from '../assets/profileimage.png';
+import axios from 'axios';
 
-function SignUpPage(props) {
-  const navigate = useNavigate(); // 페이지 이동을 위한 navigate 함수 생성
-  const [selectedImage, setSelectedImage] = useState(profileimage); // 초기 프로필 이미지를 기본 이미지로 설정
-
+function SignUpPage() {
+  const navigate = useNavigate();
+  const [profile_picture, setProfile_picture] = useState(null); // 초기값을 null로 설정하여 기본 이미지 제거
+  const [formData, setFormData] = useState({
+    name: '',
+    class_id: 1, // 초기값을 숫자로 설정
+    email: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
   // 이미지 파일 선택 핸들러
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      const imageUrl = URL.createObjectURL(e.target.files[0]);
-      setSelectedImage(imageUrl); // 선택된 이미지를 state에 저장
+      setProfile_picture(e.target.files[0]);
+    }
+  };
+
+  // 입력값 변경 핸들러
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // class_id를 숫자 값으로 변환
+    const updatedValue = name === 'class_id' ? parseInt(value, 10) : value;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: updatedValue,
+    }));
+  };
+
+  // 회원가입 요청 핸들러
+  const handleSignup = async () => {
+    const data = new FormData();
+
+    data.append('profileimg', profile_picture); // 이미지 파일 추가
+    data.append('name', formData.name);
+    data.append('class_id', formData.class_id); // class_id는 숫자 값으로 전달
+    data.append('email', formData.email);
+    data.append('password', formData.password);
+
+    // 요청 데이터 확인
+    console.log('전송할 데이터:', {
+      name: formData.name,
+      class_id: formData.class_id,
+      email: formData.email,
+      password: formData.password,
+      profileimg: profile_picture,
+    });
+
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/user/register',
+        data,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data', // 파일 업로드를 위한 설정
+            'Access-Control-Allow-Origin': '*', // CORS 에러 해결을 위한 헤더 설정
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert('회원가입이 성공적으로 완료되었습니다!');
+        navigate('/user/login');
+      }
+    } catch (error) {
+      // 에러 메시지 출력
+      console.error('회원가입 오류:', error);
+
+      if (error.response) {
+        // 서버가 응답을 반환했지만 상태 코드가 2xx가 아닌 경우
+        console.error('서버 응답 데이터:', error.response.data);
+        console.error('서버 응답 상태:', error.response.status);
+        console.error('서버 응답 헤더:', error.response.headers);
+
+        if (error.response.status >= 500) {
+          // 서버 오류인 경우
+          setError(
+            '서버 측의 문제로 회원가입에 실패했습니다. 서버 관리자에게 문의하세요.'
+          );
+        } else if (error.response.status >= 400) {
+          // 클라이언트 오류인 경우
+          setError('입력한 정보에 문제가 있습니다. 다시 확인해주세요.');
+        } else {
+          setError('회원가입에 실패했습니다. 다시 시도해주세요.');
+        }
+      } else if (error.request) {
+        // 요청이 전송되었지만 응답이 수신되지 않은 경우
+        console.error('요청 데이터:', error.request);
+        setError('서버와의 통신에 실패했습니다. 네트워크 상태를 확인하세요.');
+      } else {
+        // 요청을 설정하는 중에 발생한 오류
+        console.error('오류 메시지:', error.message);
+        setError(`회원가입에 실패했습니다. 사유: ${error.message}`);
+      }
     }
   };
 
@@ -26,153 +112,99 @@ function SignUpPage(props) {
             Hi, Welcome!
           </p>
           <img
-            src={selectedImage}
+            src={
+              profile_picture
+                ? URL.createObjectURL(profile_picture)
+                : profileimage
+            }
             alt="profileimage"
             className="w-[225px] h-[225px] ml-40 mt-10 object-cover rounded-full"
           />
-          {/* 파일 선택 인풋 */}
           <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
             className="ml-[190px] mt-5 text-sm font-normal text-blue-500 cursor-pointer"
-            style={{ zIndex: 10 }} // Input 요소가 잘 보이도록 z-index 추가
+            style={{ zIndex: 10 }}
           />
-          <button className="ml-[150px] mt-12 text-center p-4 bg-primary-darkblue text-white rounded mt-20 w-[250px] h-[40px] flex items-center justify-center">
+          <button
+            onClick={handleSignup}
+            className="ml-[150px] mt-12 text-center p-4 bg-primary-darkblue text-white rounded mt-20 w-[250px] h-[40px] flex items-center justify-center"
+          >
             Create an account
           </button>
         </div>
         <div className="absolute flex flex-col">
-          {/* name */}
           <label
-            htmlFor="website-admin"
+            htmlFor="name"
             className="block mb-2 text-sm font-medium ml-[600px] mt-10"
           >
             Name
           </label>
           <div className="flex mb-6 ml-[600px] mt-2">
-            <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-              </svg>
-            </span>
             <input
               type="text"
-              id="website-admin"
-              className="rounded-none rounded-e-lg bg-white border text-black focus:ring-blue-500 focus:border-blue-500 block w-[300px] text-sm border-gray-300 p-2.5 dark:bg-white dark:border-gray-300 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              id="name"
+              name="name"
+              className="rounded-none rounded-e-lg bg-white border text-black focus:ring-blue-500 focus:border-blue-500 block w-[300px] text-sm border-gray-300 p-2.5"
               placeholder="Enter your name"
+              value={formData.name}
+              onChange={handleChange}
             />
           </div>
-          {/* class */}
           <label
-            htmlFor="countries"
+            htmlFor="class"
             className="block mb-2 text-sm font-medium ml-[600px] mt-2"
           >
             Class
           </label>
           <div className="flex mb-6 ml-[600px] mt-2">
-            <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill="currentColor"
-                  d="M8 1V0v1Zm4 0V0v1Zm2 4v1h1V5h-1ZM6 5H5v1h1V5Zm2-3h4V0H8v2Zm4 0a1 1 0 0 1 .707.293L14.121.879A3 3 0 0 0 12 0v2Zm.707.293A1 1 0 0 1 13 3h2a3 3 0 0 0-.879-2.121l-1.414 1.414ZM13 3v2h2V3h-2Zm1 1H6v2h8V4ZM7 5V3H5v2h2Zm0-2a1 1 0 0 1 .293-.707L5.879.879A3 3 0 0 0 5 3h2Zm.293-.707A1 1 0 0 1 8 2V0a3 3 0 0 0-2.121.879l1.414 1.414ZM2 6h16V4H2v2Zm16 0h2a2 2 0 0 0-2-2v2Zm0 0v12h2V6h-2Zm0 12v2a2 2 0 0 0 2-2h-2Zm0 0H2v2h16v-2ZM2 18H0a2 2 0 0 0 2 2v-2Zm0 0V6H0v12h2ZM2 6V4a2 2 0 0 0-2 2h2Zm16.293 3.293C16.557 11.029 13.366 12 10 12c-3.366 0-6.557-.97-8.293-2.707L.293 10.707C2.557 12.971 6.366 14 10 14c3.634 0 7.444-1.03 9.707-3.293l-1.414-1.414ZM10 9v2a2 2 0 0 0 2-2h-2Zm0 0H8a2 2 0 0 0 2 2V9Zm0 0V7a2 2 0 0 0-2 2h2Zm0 0h2a2 2 0 0 0-2-2v2Z"
-                />
-              </svg>
-            </span>
             <select
-              id="countries"
-              className="bg-white border border-gray-300 text-gray-900 text-sm rounded-none rounded-e-lg w-[300px] h-11 focus:ring-blue-500 focus:border-blue-500 block dark:bg-white dark:border-gray-300 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              id="class"
+              name="class_id"
+              className="bg-white border border-gray-300 text-gray-900 text-sm rounded-none rounded-e-lg w-[300px] h-11 focus:ring-blue-500 focus:border-blue-500 block"
+              value={formData.class_id}
+              onChange={handleChange}
             >
-              <option selected value="FrontEnd">
-                FrontEnd
-              </option>
-              <option value="BackEnd">BackEnd</option>
+              <option value={1}>FrontEnd</option>
+              <option value={2}>BackEnd</option>
             </select>
           </div>
-          {/* email */}
           <label
-            htmlFor="website-admin"
+            htmlFor="email"
             className="block mb-2 text-sm font-medium ml-[600px] mt-2"
           >
             Email
           </label>
           <div className="flex mb-6 ml-[600px] mt-2">
-            <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="m10.036 8.278 9.258-7.79A1.979 1.979 0 0 0 18 0H2A1.987 1.987 0 0 0 .641.541l9.395 7.737Z" />
-                <path d="M11.241 9.817c-.36.275-.801.425-1.255.427-.428 0-.845-.138-1.187-.395L0 2.6V14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2.5l-8.759 7.317Z" />
-              </svg>
-            </span>
             <input
-              type="text"
-              id="website-admin"
-              className="rounded-none rounded-e-lg bg-white border text-black focus:ring-blue-500 focus:border-blue-500 block w-[300px] text-sm border-gray-300 p-2.5 dark:bg-white dark:border-gray-300 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              type="email"
+              id="email"
+              name="email"
+              className="rounded-none rounded-e-lg bg-white border text-black focus:ring-blue-500 focus:border-blue-500 block w-[300px] text-sm border-gray-300 p-2.5"
               placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
             />
           </div>
-          {/* password */}
           <label
-            htmlFor="website-admin"
+            htmlFor="password"
             className="block mb-2 text-sm font-medium ml-[600px] mt-2"
           >
             Password
           </label>
           <div className="flex mb-6 ml-[600px] mt-2">
-            <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M18 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3.546l3.2 3.659a1 1 0 0 0 1.506 0L13.454 14H18a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-8 10H5a1 1 0 0 1 0-2h5a1 1 0 1 1 0 2Zm5-4H5a1 1 0 0 1 0-2h10a1 1 0 1 1 0 2Z" />
-              </svg>
-            </span>
             <input
-              type="text"
-              id="website-admin"
-              className="rounded-none rounded-e-lg bg-white border text-black focus:ring-blue-500 focus:border-blue-500 block w-[300px] text-sm border-gray-300 p-2.5 dark:bg-white dark:border-gray-300 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              type="password"
+              id="password"
+              name="password"
+              className="rounded-none rounded-e-lg bg-white border text-black focus:ring-blue-500 focus:border-blue-500 block w-[300px] text-sm border-gray-300 p-2.5"
               placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
             />
           </div>
-          <div className="flex mb-6 ml-[600px] mt-1">
-            <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M18 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3.546l3.2 3.659a1 1 0 0 0 1.506 0L13.454 14H18a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-8 10H5a1 1 0 0 1 0-2h5a1 1 0 1 1 0 2Zm5-4H5a1 1 0 0 1 0-2h10a1 1 0 1 1 0 2Z" />
-              </svg>
-            </span>
-            <input
-              type="text"
-              id="website-admin"
-              className="rounded-none rounded-e-lg bg-white border text-black focus:ring-blue-500 focus:border-blue-500 block w-[300px] text-sm border-gray-300 p-2.5 dark:bg-white dark:border-gray-300 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Enter your password"
-            />
-          </div>
+          {error && <p className="text-red-500 ml-[600px]">{error}</p>}
         </div>
       </div>
     </>
