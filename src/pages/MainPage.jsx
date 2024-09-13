@@ -1,14 +1,17 @@
 import Header from '../components/common/header/Header';
-import myProfileImg from '../assets/profileimage.png';
 import LeftBar from '../components/common/leftbar/LeftBar';
+import Calendar from '../components/main/calendar/Calendar';
+import TodoList from '../components/main/todoList/TodoList';
 
 export default function MainPage() {
-    return (
-        <>
-            <Header img={myProfileImg}/>
-            <LeftBar />
-            {/* <Calendar /> */}
-            {/* <TodoList /> */}
-        </>
-    );
+  return (
+    <div className="flex-col">
+      <Header />
+      <div className="flex">
+        <LeftBar />
+        <Calendar />
+        <TodoList />
+      </div>
+    </div>
+  );
 }

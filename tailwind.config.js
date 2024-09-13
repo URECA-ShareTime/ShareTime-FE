@@ -12,6 +12,10 @@ module.exports = withMT({
           darkblue: '#3F6886',
         },
       },
+      height: {
+        header : '80px',
+        content: 'calc(100vh - 80px)',
+      }
     },
   },
   plugins: [],

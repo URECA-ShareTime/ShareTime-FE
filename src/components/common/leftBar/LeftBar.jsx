@@ -8,13 +8,14 @@ export default function LeftBar() {
     const handleActiveIdx = (idx) => setActiveIdx(activeIdx === idx ? 0 : idx); 
 
     return (
-        <div className="w-[150px] h-screen px-4 py-4">
+        <div className="w-[150px] h-content overflow-y-scroll px-4 py-4 bg-primary-darkblue">
             {/* 전체, 클래스, 스터디 데이터 props로 넘겨주기 */}
             <LeftBarAccordion title="All" activeIdx={activeIdx} id={1} handleActiveIdx={handleActiveIdx}/>
             <LeftBarAccordion title="Front-End" activeIdx={activeIdx} id={2} handleActiveIdx={handleActiveIdx}/> 
             <LeftBarAccordion title="Back-End" activeIdx={activeIdx} id={3} handleActiveIdx={handleActiveIdx}/>
             {/* 스터디 배열의 개수만큼 map으로 만들기 */}
             <LeftBarAccordion title="Study1" activeIdx={activeIdx} id={4} handleActiveIdx={handleActiveIdx}/>
+            <LeftBarAccordion title="Study2" activeIdx={activeIdx} id={5} handleActiveIdx={handleActiveIdx}/>
         </div>
     )
 }

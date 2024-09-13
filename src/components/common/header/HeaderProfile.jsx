@@ -1,7 +1,9 @@
-export default function HeaderProfile({img}) {
+import myProfileImg from '../../../assets/myProfile.png';
+
+export default function HeaderProfile() {
     return (
         <>
-            <img src={img} alt="profileImg" className="w-[40px] h-[40px]"/>
+            <img src={myProfileImg} alt="profileImg" className="w-[40px] h-[40px]"/>
         </>
     )
 }
