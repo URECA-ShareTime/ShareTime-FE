@@ -1,4 +1,4 @@
-// src/pages/Enterpage.jsx
+// src/pages/EnterPage.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // useNavigate 훅을 임포트
 import GuestBackGround from '../components/GuestBackGround';
