@@ -1,4 +1,4 @@
-// src/pages/LoginPage.jsx
+// src/pages/Loginpage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // useNavigate 훅을 임포트
 import GuestBackGround from '../components/GuestBackGround'; // GuestBackGround 컴포넌트 임포트
