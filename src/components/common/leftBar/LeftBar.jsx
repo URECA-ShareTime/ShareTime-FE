@@ -8,7 +8,11 @@ export default function LeftBar() {
     const handleActiveIdx = (idx) => setActiveIdx(activeIdx === idx ? 0 : idx); 
 
     return (
+<<<<<<< HEAD
         <div className="w-auto h-content overflow-y-scroll overflow-x-hidden px-4 py-4 bg-primary-darkblue">
+=======
+        <div className="w-[150px] h-content overflow-y-scroll px-4 py-4 bg-primary-darkblue">
+>>>>>>> d2d7a22 (✨ Feat: LeftBarProfile 컴포넌트 구현 및 MainPage 스타일 수정)
             {/* 전체, 클래스, 스터디 데이터 props로 넘겨주기 */}
             <LeftBarAccordion title="All" activeIdx={activeIdx} id={1} handleActiveIdx={handleActiveIdx}/>
             <LeftBarAccordion title="Front-End" activeIdx={activeIdx} id={2} handleActiveIdx={handleActiveIdx}/> 
