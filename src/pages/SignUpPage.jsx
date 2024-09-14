@@ -5,7 +5,7 @@ import GuestBackGround from '../components/GuestBackGround';
 import profileimage from '../assets/profileimage.png';
 import axios from 'axios';
 
-function Signuppage() {
+function SignUpPage() {
   const navigate = useNavigate();
   const [profile_picture, setProfile_picture] = useState(null);
   const [formData, setFormData] = useState({
@@ -15,7 +15,6 @@ function Signuppage() {
     password: '',
   });
   const [error, setError] = useState('');
-
   // 이미지 파일 선택 핸들러
   // 이메일 형식 검사 함수
   const validateEmail = (email) => {
@@ -120,7 +119,7 @@ function Signuppage() {
           />
           <button
             onClick={handleSignup}
-            className="ml-[150px] mt-12 text-center p-4 bg-primary-darkblue text-white rounded mt-20 w-[250px] h-[40px] flex items-center justify-center"
+            className="ml-[150px] mt-12 text-center p-4 bg-primary-darkblue text-white rounded  w-[250px] h-[40px] flex items-center justify-center"
           >
             Create an account
           </button>
@@ -202,4 +201,4 @@ function Signuppage() {
   );
 }
 
-export default Signuppage;
+export default SignUpPage;
