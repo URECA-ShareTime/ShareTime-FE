@@ -1,4 +1,6 @@
+
 // SignUpPage.jsx
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GuestBackGround from '../components/GuestBackGround';
@@ -7,29 +9,29 @@ import axios from 'axios';
 
 function SignUpPage() {
   const navigate = useNavigate();
+
   const [profile_picture, setProfile_picture] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     class_id: 1,
+
     email: '',
     password: '',
   });
   const [error, setError] = useState('');
   // 이미지 파일 선택 핸들러
+
   // 이메일 형식 검사 함수
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setProfile_picture(e.target.files[0]);
-    }
-  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     const updatedValue = name === 'class_id' ? parseInt(value, 10) : value;
 
     setFormData((prevData) => ({
@@ -37,6 +39,7 @@ function SignUpPage() {
       [name]: updatedValue,
     }));
   };
+
 
   const handleSignup = async () => {
     // 이메일 형식 확인
@@ -52,6 +55,7 @@ function SignUpPage() {
     data.append('email', formData.email);
     data.append('password', formData.password);
 
+
     try {
       const response = await axios.post(
         'http://localhost:8080/user/register',
@@ -60,6 +64,7 @@ function SignUpPage() {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Access-Control-Allow-Origin': '*',
+
           },
         }
       );
@@ -69,6 +74,7 @@ function SignUpPage() {
         navigate('/user/login');
       }
     } catch (error) {
+
       if (error.response) {
         const message = error.response.data;
 
@@ -87,6 +93,7 @@ function SignUpPage() {
       } else if (error.request) {
         setError('서버와의 통신에 실패했습니다. 네트워크 상태를 확인하세요.');
       } else {
+
         setError(`회원가입에 실패했습니다. 사유: ${error.message}`);
       }
     }
@@ -119,7 +126,9 @@ function SignUpPage() {
           />
           <button
             onClick={handleSignup}
+
             className="ml-[150px] mt-12 text-center p-4 bg-primary-darkblue text-white rounded  w-[250px] h-[40px] flex items-center justify-center"
+
           >
             Create an account
           </button>

@@ -31,7 +31,9 @@ function LoginPage() {
 
       if (response.status === 200) {
         alert('로그인 성공!');
+        
         navigate('/main'); // 로그인 성공 후 이동할 페이지로 이동
+
       }
     } catch (error) {
       console.error('로그인 오류:', error);
