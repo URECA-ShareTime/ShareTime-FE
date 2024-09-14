@@ -1,3 +1,4 @@
+// SignUpPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GuestBackGround from '../components/GuestBackGround';
@@ -6,27 +7,30 @@ import axios from 'axios';
 
 function Signuppage() {
   const navigate = useNavigate();
-  const [profile_picture, setProfile_picture] = useState(null); // 초기값을 null로 설정하여 기본 이미지 제거
+  const [profile_picture, setProfile_picture] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    class_id: 1, // 초기값을 숫자로 설정
+    class_id: 1,
     email: '',
     password: '',
   });
   const [error, setError] = useState('');
 
   // 이미지 파일 선택 핸들러
+  // 이메일 형식 검사 함수
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setProfile_picture(e.target.files[0]);
     }
   };
 
-  // 입력값 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // class_id를 숫자 값으로 변환
     const updatedValue = name === 'class_id' ? parseInt(value, 10) : value;
 
     setFormData((prevData) => ({
@@ -35,24 +39,19 @@ function Signuppage() {
     }));
   };
 
-  // 회원가입 요청 핸들러
   const handleSignup = async () => {
-    const data = new FormData();
+    // 이메일 형식 확인
+    if (!validateEmail(formData.email)) {
+      setError('이메일 형식이 맞지 않습니다.');
+      return;
+    }
 
-    data.append('profileimg', profile_picture); // 이미지 파일 추가
+    const data = new FormData();
+    data.append('profileimg', profile_picture);
     data.append('name', formData.name);
-    data.append('class_id', formData.class_id); // class_id는 숫자 값으로 전달
+    data.append('class_id', formData.class_id);
     data.append('email', formData.email);
     data.append('password', formData.password);
-
-    // 요청 데이터 확인
-    console.log('전송할 데이터:', {
-      name: formData.name,
-      class_id: formData.class_id,
-      email: formData.email,
-      password: formData.password,
-      profileimg: profile_picture,
-    });
 
     try {
       const response = await axios.post(
@@ -60,8 +59,8 @@ function Signuppage() {
         data,
         {
           headers: {
-            'Content-Type': 'multipart/form-data', // 파일 업로드를 위한 설정
-            'Access-Control-Allow-Origin': '*', // CORS 에러 해결을 위한 헤더 설정
+            'Content-Type': 'multipart/form-data',
+            'Access-Control-Allow-Origin': '*',
           },
         }
       );
@@ -71,33 +70,24 @@ function Signuppage() {
         navigate('/user/login');
       }
     } catch (error) {
-      // 에러 메시지 출력
-      console.error('회원가입 오류:', error);
-
       if (error.response) {
-        // 서버가 응답을 반환했지만 상태 코드가 2xx가 아닌 경우
-        console.error('서버 응답 데이터:', error.response.data);
-        console.error('서버 응답 상태:', error.response.status);
-        console.error('서버 응답 헤더:', error.response.headers);
+        const message = error.response.data;
 
-        if (error.response.status >= 500) {
-          // 서버 오류인 경우
+        // 서버 응답 메시지에 따라 에러 메시지를 설정
+        if (message.includes('email')) {
+          setError('이미 사용중인 메일입니다.');
+        } else if (message.includes('이메일 형식이 맞지 않습니다')) {
+          setError('이메일 형식이 맞지 않습니다.');
+        } else if (error.response.status >= 500) {
           setError(
             '서버 측의 문제로 회원가입에 실패했습니다. 서버 관리자에게 문의하세요.'
           );
-        } else if (error.response.status >= 400) {
-          // 클라이언트 오류인 경우
-          setError('입력한 정보에 문제가 있습니다. 다시 확인해주세요.');
         } else {
-          setError('회원가입에 실패했습니다. 다시 시도해주세요.');
+          setError('이미 사용중인 메일입니다.');
         }
       } else if (error.request) {
-        // 요청이 전송되었지만 응답이 수신되지 않은 경우
-        console.error('요청 데이터:', error.request);
         setError('서버와의 통신에 실패했습니다. 네트워크 상태를 확인하세요.');
       } else {
-        // 요청을 설정하는 중에 발생한 오류
-        console.error('오류 메시지:', error.message);
         setError(`회원가입에 실패했습니다. 사유: ${error.message}`);
       }
     }
