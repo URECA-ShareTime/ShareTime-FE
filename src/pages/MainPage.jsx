@@ -1,6 +1,6 @@
 import Header from '../components/common/header/Header';
 import LeftBar from '../components/common/leftbar/LeftBar';
-import Calendar from '../components/main/calendar/Calendar';
+import MyCalendar from '../components/main/calendar/MyCalendar';
 import TodoList from '../components/main/todoList/TodoList';
 
 export default function MainPage() {
@@ -9,7 +9,7 @@ export default function MainPage() {
       <Header />
       <div className="flex">
         <LeftBar />
-        <Calendar />
+        <MyCalendar />
         <TodoList />
       </div>
     </div>
