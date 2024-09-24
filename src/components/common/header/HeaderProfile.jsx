@@ -39,7 +39,7 @@ export default function HeaderProfile() {
       {isMenuOpen && (
         <div
           ref={menuRef}
-          className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-xl p-4 border border-gray-200"
+          className="z-10 absolute right-0 mt-2 w-48 bg-white shadow-md rounded-xl p-4 border border-gray-200"
         >
           <button
             className="block text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
