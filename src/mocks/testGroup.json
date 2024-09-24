@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "groupId": 1,
+    "type": "FrontEnd"
+  },
+  {
+    "id": 2,
+    "groupId": 1,
+    "type": "ReCoder"
+  },
+  {
+    "id": 3,
+    "groupId": 3,
+    "type": "이건뭐지"
+  },
+  {
+    "id": 4,
+    "groupId": 4,
+    "type": "보노보노"
+  }
+]
