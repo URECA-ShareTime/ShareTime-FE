@@ -7,10 +7,10 @@ export default function MainPage() {
   return (
     <div className="flex-col">
       <Header />
-      <div className="flex">
+      <div className="flex justify-between">
         <LeftBar />
         <MyCalendar />
-        <TodoList />
+        {/* <TodoList /> */}
       </div>
     </div>
   );
