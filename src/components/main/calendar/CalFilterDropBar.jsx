@@ -81,7 +81,7 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
                 <div className="flex items-center">
                   <input
                     type="checkbox"
-                    id={resource.groupId}
+                    id={resource.type}
                     onChange={(e) => handleItemChecked(e)}
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500 accent-blue-gray-700"
                   />
