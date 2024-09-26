@@ -1,9 +1,12 @@
 import { useState } from 'react';
 //UserStudy테이블의 study_id, User의 class_id 불러오기
-import testGroup from '../../../mocks/testGroup.json';
+import testStudy from '../../../mocks/testStudy.json';
+import testClass from '../../../mocks/testClass.json';
+import { all } from 'axios';
 
 export default function CalFilterDropBar({ setEvents, allEvents }) {
-  const [checkedList, setCheckedList] = useState([]); //체크된 리스트 관리
+  const [checkedClassList, setCheckedClassList] = useState([]); //체크된 리스트 관리
+  const [checkedStudyList, setCheckedStudyList] = useState([]); //체크된 리스트 관리
   const [isChecked, setIsChecked] = useState(false); //체크박스 상태 관리
   const [isOpen, setIsOpen] = useState(false); //드롭다운 메뉴 상태 관리
 
@@ -11,12 +14,17 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
     setIsOpen(!isOpen);
   };
 
-  const handleItemChecked = (e) => {
+  const handleClassItemChecked = (e) => {
     setIsChecked(!isChecked);
-    checkedItemHandle(e);
+    checkedItemHandle(e, checkedClassList, setCheckedClassList);
   };
 
-  const checkedItemHandle = (e) => {
+  const handleStudyItemChecked = (e) => {
+    setIsChecked(!isChecked);
+    checkedItemHandle(e, checkedStudyList, setCheckedStudyList);
+  };
+
+  const checkedItemHandle = (e, checkedList, setCheckedList) => {
     const { id, checked } = e.target;
     const prevList = checkedList;
     if (checked) {
@@ -31,12 +39,21 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
 
   const handleFilterChange = () => {
     let filteredEvents = [];
-    checkedList.forEach((item) => {
+    
+    checkedClassList.forEach((item) => {
       filteredEvents = [
         ...filteredEvents,
-        ...allEvents.filter((event) => event.type === item),
+        ...allEvents.filter((event) => event.classId.includes(item)),
       ];
     });
+
+    checkedStudyList.forEach((item) => {
+      filteredEvents = [
+        ...filteredEvents,
+        ...allEvents.filter((event) => event.studyId.includes(item)),
+      ];
+    });
+
     setEvents(filteredEvents);
     setIsOpen(false);
   };
@@ -76,20 +93,38 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
             className="flex flex-col justify-center p-3 space-y-3 text-sm text-gray-700 dark:text-gray-200"
             arialabelledby="dropdownBgHoverButton"
           >
-            {testGroup.map((resource) => (
-              <li className="p-0" key={resource.id}>
+            {testClass.map((resource) => (
+              <li className="p-0" key={`class-${resource.id}`}>
                 <div className="flex items-center">
                   <input
                     type="checkbox"
-                    id={resource.type}
-                    onChange={(e) => handleItemChecked(e)}
+                    id={resource.value}
+                    onChange={(e) => handleClassItemChecked(e)}
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500 accent-blue-gray-700"
                   />
                   <label
-                    htmlFor={resource.type}
+                    htmlFor={resource.value}
                     className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                   >
-                    {resource.type}
+                    {resource.value}
+                  </label>
+                </div>
+              </li>
+            ))}
+            {testStudy.map((resource) => (
+              <li className="p-0" key={`study-${resource.id}`}>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={resource.value}
+                    onChange={(e) => handleStudyItemChecked(e)}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500 accent-blue-gray-700"
+                  />
+                  <label
+                    htmlFor={resource.value}
+                    className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                  >
+                    {resource.value}
                   </label>
                 </div>
               </li>

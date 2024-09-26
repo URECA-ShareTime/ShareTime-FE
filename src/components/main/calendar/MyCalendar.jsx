@@ -23,19 +23,24 @@ export default function MyCalendar() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [newEvent, setNewEvent] = useState({
     id: events.length + 1,
+    title: "",
+    description: "",
+    start: "",
+    end: "",
+    groupType: [],
+    classId: [],
+    studyId: [],
     creator: 1
   });
   const [isEdit, setIsEdit] = useState(false);
 
   const handleSelectSlot = ({start}) => {
     setSelectedDate(start);
-    setNewEvent({
-      title: "",
+    setNewEvent((prevEvent) => ({
+      ...prevEvent,
       start: start,
-      end: start,
-      type: "",
-      description: "",
-    });
+      end: moment(start).add(1, 'hours').toDate()
+    }));
     setModalOpen(true);
     setIsEdit(false);
   };
