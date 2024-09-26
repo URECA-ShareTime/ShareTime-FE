@@ -26,34 +26,29 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
 
   const checkedItemHandle = (e, checkedList, setCheckedList) => {
     const { id, checked } = e.target;
+    const parseId = id.split('-')[1];
     const prevList = checkedList;
     if (checked) {
       //체크된 리스트에 id 추가
-      setCheckedList([...prevList, id]);
+      setCheckedList([...prevList, parseId]);
     } else {
       //체크된 리스트에 id 제거
-      const updateList = prevList.filter((item) => item !== id);
+      const updateList = prevList.filter((item) => item !== parseId);
       setCheckedList(updateList);
     }
   };
 
   const handleFilterChange = () => {
-    let filteredEvents = [];
-    
-    checkedClassList.forEach((item) => {
-      filteredEvents = [
-        ...filteredEvents,
-        ...allEvents.filter((event) => event.classId.includes(item)),
-      ];
-    });
-
-    checkedStudyList.forEach((item) => {
-      filteredEvents = [
-        ...filteredEvents,
-        ...allEvents.filter((event) => event.studyId.includes(item)),
-      ];
-    });
-
+    const filteredEvents = [
+      ...checkedClassList.reduce((acc, item) => {
+        const itemAsNumber = Number(item);
+        return acc.concat(allEvents.filter((event) => event.classId.includes(itemAsNumber)));
+      }, []),
+      ...checkedStudyList.reduce((acc, item) => {
+        const itemAsNumber = Number(item);
+        return acc.concat(allEvents.filter((event) => event.studyId.includes(itemAsNumber)));
+      }, [])
+    ];
     setEvents(filteredEvents);
     setIsOpen(false);
   };
@@ -98,15 +93,15 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
                 <div className="flex items-center">
                   <input
                     type="checkbox"
-                    id={resource.value}
+                    id={`class-${resource.id}`}
                     onChange={(e) => handleClassItemChecked(e)}
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500 accent-blue-gray-700"
                   />
                   <label
-                    htmlFor={resource.value}
+                    htmlFor={resource.name}
                     className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                   >
-                    {resource.value}
+                    {resource.name}
                   </label>
                 </div>
               </li>
@@ -116,15 +111,15 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
                 <div className="flex items-center">
                   <input
                     type="checkbox"
-                    id={resource.value}
+                    id={`study-${resource.id}`}
                     onChange={(e) => handleStudyItemChecked(e)}
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500 accent-blue-gray-700"
                   />
                   <label
-                    htmlFor={resource.value}
+                    htmlFor={resource.name}
                     className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                   >
-                    {resource.value}
+                    {resource.name}
                   </label>
                 </div>
               </li>
