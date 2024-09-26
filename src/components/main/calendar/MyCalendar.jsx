@@ -1,11 +1,11 @@
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
-import { Button} from '@material-tailwind/react';
+import { Button } from '@material-tailwind/react';
 import { useEffect, useState } from 'react';
 import CustomToolbar from './CustomToolBar';
 import testEvents from '../../../mocks/testEvents.json';
-import TaskModel from './TaskModal';
+import TaskModal from './TaskModal';
 
 export default function MyCalendar() {
   // JSON 데이터를 불러오고, 날짜를 Date 객체로 변환
@@ -25,6 +25,7 @@ export default function MyCalendar() {
     id: events.length + 1,
     creator: 1
   });
+  const [isEdit, setIsEdit] = useState(false);
 
   const handleSelectSlot = ({start}) => {
     setSelectedDate(start);
@@ -33,10 +34,18 @@ export default function MyCalendar() {
       start: start,
       end: start,
       type: "",
+      description: "",
     });
     setModalOpen(true);
+    setIsEdit(false);
   };
   
+  const handleSelectEvent = (event) => {
+    setNewEvent(event);
+    setModalOpen(true);
+    setIsEdit(true);
+  }
+
   return (
     <div className="w-full h-auto mx-[20px] my-[20px] mb-[30px] bg-primary">
       <Calendar
@@ -51,14 +60,18 @@ export default function MyCalendar() {
         }}
         className="bg-white text-gray-600"
         onSelectSlot={handleSelectSlot}
+        onSelectEvent={handleSelectEvent}
+        selectable
       />
-      <TaskModel 
+      <TaskModal 
         isModalOpen={isModalOpen}
         setModalOpen={setModalOpen}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
         newEvent={newEvent}
-        setNewEvent={setNewEvent}s
+        setNewEvent={setNewEvent}
+        events={events}
+        setEvents={setEvents}
+        isEdit={isEdit}
+        setIsEdit={setIsEdit}
       />
     </div>
   );
