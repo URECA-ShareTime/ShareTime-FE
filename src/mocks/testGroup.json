@@ -2,21 +2,25 @@
   {
     "id": 1,
     "groupId": 1,
-    "type": "FrontEnd"
+    "value": "FrontEnd",
+    "label": "FrontEnd"
   },
   {
     "id": 2,
     "groupId": 1,
-    "type": "ReCoder"
+    "value": "ReCoder",
+    "label": "ReCoder"
   },
   {
     "id": 3,
     "groupId": 3,
-    "type": "이건뭐지"
+    "value": "이건뭐지",
+    "label": "이건뭐지"
   },
   {
     "id": 4,
     "groupId": 4,
-    "type": "보노보노"
+    "value": "보노보노",
+    "label": "보노보노"
   }
 ]
