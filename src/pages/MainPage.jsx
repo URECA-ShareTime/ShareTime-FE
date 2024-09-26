@@ -1,16 +1,16 @@
 import Header from '../components/common/header/Header';
 import LeftBar from '../components/common/leftbar/LeftBar';
-import Calendar from '../components/main/calendar/Calendar';
+import MyCalendar from '../components/main/calendar/MyCalendar';
 import TodoList from '../components/main/todoList/TodoList';
 
 export default function MainPage() {
   return (
     <div className="flex-col">
       <Header />
-      <div className="flex">
+      <div className="flex justify-between">
         <LeftBar />
-        <Calendar />
-        <TodoList />
+        <MyCalendar />
+        {/* <TodoList /> */}
       </div>
     </div>
   );
