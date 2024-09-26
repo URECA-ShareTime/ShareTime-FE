@@ -1,25 +1,8 @@
 import moment from 'moment';
-import testGroups from '../../../mocks/testGroup.json';
+import testClass from '../../../mocks/testClass.json';
+import testStudy from '../../../mocks/testStudy.json';
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
-
-// { --> testEvents.json
-//   "id": 0,
-//   "title": "FrontEnd",
-//   "start": "2024-09-26T09:00:00",
-//   "end": "2024-09-29T13:00:00",
-//   "resourceId": 1, --> group_id
-//   "type": "FrontEnd",
-//   "creator": 1
-// "description": "FrontEnd",
-// },
-
-// { --> testGroups.json
-//   "id": 1,
-//   "groupId": 1,
-//   "value": "FrontEnd",
-//   "label": "FrontEnd"
-// },
 
 export default function TaskModal({
   isModalOpen,
@@ -31,11 +14,26 @@ export default function TaskModal({
   isEdit,
   setIsEdit,
 }) {
-  const [selectedOptions, setSelectedOptions] = useState(
-    testGroups.filter((group) =>
-      Array.isArray(newEvent.resourceId) && newEvent.resourceId.includes(group.id)
-    )
+  const [selectedClasses, setSelectedClasses] = useState(
+    // testClass.filter((group) => newEvent.classId.includes(group.Id)) //
   );
+
+  const [selectedStudies, setSelectedStudies] = useState(
+    // testStudy.filter((group) => newEvent.studyId.includes(group.Id))
+  );
+
+  useEffect(() => {
+    if (isModalOpen && isEdit) {
+      setSelectedClasses(
+        testClass.filter((group) => newEvent.classId.includes(group.id))
+          .map((group) => ({ value: group.id, label: group.name }))
+      );
+      setSelectedStudies(
+        testStudy.filter((group) => newEvent.studyId.includes(group.id))
+          .map((group) => ({ value: group.id, label: group.name }))
+      );
+    }
+  }, [isModalOpen, isEdit, newEvent]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -50,18 +48,26 @@ export default function TaskModal({
     setModalOpen(false);
   };
 
-  const handleSelectChange = (selected) => {
-    setSelectedOptions(selected);
+  const handleClassChange = (selected) => {
+    setSelectedClasses(selected);
     setNewEvent({
       ...newEvent,
-      resourceId: selected.map((item) => item.id),
-      type: selected.map((item) => item.value),
+      groupType: Array.from(new Set([...newEvent.groupType, 'class'])),
+      classId: selected ? [selected.value] : [],
+    });
+  };
+
+  const handleStudyChange = (selected) => {
+    setSelectedStudies(selected);
+    setNewEvent({
+      ...newEvent,
+      groupType: Array.from(new Set([...newEvent.groupType, 'study'])),
+      studyId: selected ? selected.map((item) => item.value) : [],
     });
   };
 
   //Task 수정 처리
   const handleUpdateEvent = () => {
-    console.log('handleUpdateEvent');
     //수정할 이벤트를 id로 찾아서 newEvent 값으로 수정한 배열 리턴
     const updatedEvents = events.map((event) =>
       event.id === newEvent.id ? newEvent : event
@@ -122,16 +128,29 @@ export default function TaskModal({
                   GroupTag
                 </label>
                 <Select
-                  defaultValue={testGroups.find(
-                    (group) => group.id === newEvent.resourceId
-                  )}
-                  isMulti
-                  options={testGroups}
-                  className="basic-multi-select focus:outline-none text-sm"
+                  //isMulti
+                  options={testClass.map((group) => ({
+                    value: group.id,
+                    label: group.name,
+                  }))}
+                  className="basic-multi-select focus:outline-none text-sm w-fit"
                   classNamePrefix="select"
-                  onChange={handleSelectChange}
-                  value={selectedOptions}
-                  placeholder="select a group option"
+                  onChange={handleClassChange}
+                  value={selectedClasses}
+                  placeholder="select class"
+                  isClearable={true}
+                />
+                <Select
+                  isMulti
+                  options={testStudy.map((group) => ({
+                    value: group.id,
+                    label: group.name,
+                  }))}
+                  className="basic-multi-select focus:outline-none text-sm max-w-50"
+                  classNamePrefix="select"
+                  onChange={handleStudyChange}
+                  value={selectedStudies}
+                  placeholder="select study"
                 />
               </div>
             </div>
