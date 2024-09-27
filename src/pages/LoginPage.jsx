@@ -31,7 +31,8 @@ function LoginPage() {
 
       if (response.status === 200) {
         alert('로그인 성공!');
-        
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
         navigate('/main'); // 로그인 성공 후 이동할 페이지로 이동
 
       }

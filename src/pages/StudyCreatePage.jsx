@@ -46,6 +46,11 @@ function StudyCreatePage() {
         {
           study_name,
           study_key,
+        },
+        {
+          headers: {
+            Authorization: localStorage.getItem('accessToken'),
+          },
         }
       );
 
