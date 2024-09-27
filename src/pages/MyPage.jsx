@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from '../components/common/header/Header';
-import LeftBar from '../components/common/leftbar/LeftBar';
+import LeftBar from '../components/common/leftBar/LeftBar';
 
 function MyPage(props) {
   return (

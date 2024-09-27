@@ -5,6 +5,7 @@ import EnterPage from './pages/EnterPage'; // Enterpage 컴포넌트 임포트
 import LoginPage from './pages/LoginPage'; // Loginpage 컴포넌트 임포트
 import SignUpPage from './pages/SignUpPage';
 import MainPage from './pages/MainPage';
+import MyPage from './pages/MyPage';
 import StudyCreatePage from './pages/StudyCreatePage';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Route path="user/signup" element={<SignUpPage />} />
       <Route path="/main" element={<MainPage />} />
       <Route path="/studycreate" element={<StudyCreatePage />} />
+      <Route path="/mypage" element={<MyPage />} />
     </Routes>
   );
 }

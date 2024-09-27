@@ -45,7 +45,7 @@ export default function HeaderProfile() {
             className="block text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => {
               // 마이페이지로 이동하는 로직을 추가
-              alert('마이페이지로 이동');
+              navigate('/MyPage');
             }}
           >
             마이페이지

@@ -49,7 +49,7 @@ function StudyCreatePage() {
         },
         {
           headers: {
-            Authorization: localStorage.getItem('accessToken'),
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         }
       );
@@ -66,15 +66,27 @@ function StudyCreatePage() {
         }
       } else if (response.data.message === 'INVALID_KEY') {
         alert('키가 틀렸습니다. 다시 입력해주세요.');
+      } else if (response.data.message === 'ALREADY_JOINED') {
+        alert('이미 참여한 스터디입니다.');
       } else {
         alert('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.');
       }
     } catch (error) {
-      // 서버 응답이 없는 경우를 처리
-      if (error.response && error.response.data.message === 'INVALID_KEY') {
-        alert('키가 틀렸습니다. 다시 입력해주세요.');
+      // 서버 응답이 있는 경우
+      if (error.response) {
+        // 서버에서 보낸 오류 메시지를 처리
+        const errorMessage = error.response.data.message;
+        if (errorMessage === 'INVALID_KEY') {
+          alert('키가 틀렸습니다. 다시 입력해주세요.');
+        } else if (errorMessage === 'ALREADY_JOINED') {
+          alert('이미 참여한 스터디입니다.');
+        } else {
+          alert(`오류 발생: ${errorMessage}`);
+        }
       } else {
+        // 서버 응답이 없는 경우 일반적인 오류 처리
         console.error('Error joining or creating study:', error);
+        alert('서버와의 연결에 문제가 발생했습니다. 다시 시도해주세요.');
       }
     }
   };
