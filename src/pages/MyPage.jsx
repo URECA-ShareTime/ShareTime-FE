@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from '../components/common/header/Header';
@@ -186,6 +187,7 @@ function MyPage() {
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

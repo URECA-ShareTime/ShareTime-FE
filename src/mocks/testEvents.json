@@ -1,0 +1,44 @@
+[
+  {
+    "id": 0,
+    "title": "FrontEnd",
+    "description": "FrontEnd 스터디",
+    "start": "2024-09-26T09:00:00",
+    "end": "2024-09-29T13:00:00",
+    "groupType": ["class"],
+    "classId": [1],
+    "studyId": [], 
+    "creator": 1
+  },
+  {
+    "id": 1,
+    "title": "ReCoder",
+    "description": "Recoder 스터디",
+    "start": "2024-09-27T14:00:00",
+    "end": "2024-09-29T16:30:00",
+    "groupType": ["study"],
+    "classId": [],
+    "studyId": [1], 
+    "creator": 1
+  },
+  {
+    "id": 2,
+    "title": "이건뭐지",
+    "start": "2024-09-29T08:30:00",
+    "end": "2024-09-29T12:30:00",
+    "groupType": ["study"],
+    "classId": [],
+    "studyId": [2], 
+    "creator": 1
+  },
+  {
+    "id": 11,
+    "title": "보노보노",
+    "start": "2024-09-30T07:00:00",
+    "end": "2024-09-30T10:30:00",
+    "groupType": ["study"],
+    "classId": [],
+    "studyId": [3], 
+    "creator": 1
+  }
+]

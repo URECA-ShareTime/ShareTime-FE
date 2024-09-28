@@ -39,13 +39,14 @@ export default function HeaderProfile() {
       {isMenuOpen && (
         <div
           ref={menuRef}
-          className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-xl p-4 border border-gray-200"
+          className="z-10 absolute right-0 mt-2 w-48 bg-white shadow-md rounded-xl p-4 border border-gray-200"
         >
           <button
             className="block text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => {
               // 스터디 추가 페이지로 이동하는 로직을 추가
               navigate('/mypage');
+
             }}
           >
             마이페이지

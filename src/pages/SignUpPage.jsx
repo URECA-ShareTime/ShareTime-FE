@@ -99,6 +99,11 @@ function SignUpPage() {
     }
   };
 
+  const handleImageChange = (e) => { // 이미지 파일 선택 핸들러 일단 야매로 넣음
+    const imageFile = e.target.files[0];
+    setProfile_picture(imageFile);
+  }
+
   return (
     <>
       <GuestBackGround />
