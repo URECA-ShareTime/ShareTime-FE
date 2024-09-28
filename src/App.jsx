@@ -7,6 +7,7 @@ import SignUpPage from './pages/SignUpPage';
 import MainPage from './pages/MainPage';
 import MyPage from './pages/MyPage';
 import StudyCreatePage from './pages/StudyCreatePage';
+import MyPage from './pages/MyPage';
 
 function App() {
   return (
