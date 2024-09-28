@@ -2,53 +2,68 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Header from '../components/common/header/Header';
 import LeftBar from '../components/common/leftBar/LeftBar';
-import profileimage from '../assets/profileimage.png';
+import profileimage from '../assets/profileimage.png'; // 기본 이미지 경로
 
 function MyPage() {
   const [userInfo, setUserInfo] = useState({
     name: '',
     email: '',
-    profileImage: '',
+    profileImage: profileimage, // 초기 이미지를 기본 이미지로 설정
     className: '',
+    password: '', // 사용자 비밀번호 추가
   });
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(''); // 비밀번호 초기화 상태
   const [newProfileImage, setNewProfileImage] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false); // 이미지 로드 상태 관리
   const menuRef = useRef(null);
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/user/info', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
+  // 사용자 정보 가져오기 함수
+  const fetchUserInfo = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/user/info', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+
+      console.log('User Info Response:', response.data); // 서버에서 받은 사용자 정보 출력
+
+      if (response.data && response.data.name) {
+        // 프로필 이미지 URL에 cacheBust 파라미터 추가
+        const profileImageUrl = response.data.profile_picture
+          ? `http://localhost:8080${response.data.profile_picture}?cacheBust=${new Date().getTime()}`
+          : profileimage;
+
+        console.log('Profile Image URL:', profileImageUrl); // 이미지 경로 출력
+
+        setUserInfo({
+          name: response.data.name,
+          email: response.data.email,
+          profileImage: profileImageUrl,
+          className:
+            response.data.class_id === 1
+              ? 'FrontEnd'
+              : response.data.class_id === 2
+                ? 'BackEnd'
+                : 'Unknown',
+          password: response.data.password, // 기존 비밀번호 설정
         });
 
-        if (response.data && response.data.name) {
-          setUserInfo({
-            name: response.data.name,
-            email: response.data.email,
-            profileImage: response.data.profile_picture || profileimage,
-            className:
-              response.data.class_id === 1
-                ? 'FrontEnd'
-                : response.data.class_id === 2
-                  ? 'BackEnd'
-                  : 'Unknown',
-          });
-        } else {
-          console.error('Unexpected response format:', response.data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch user info:', error);
-        alert('사용자 정보를 불러오는 데 실패했습니다. 다시 시도해주세요.');
+        setPassword(response.data.password); // password 상태를 설정
+        setImageLoaded(false); // 이미지 로드 상태 초기화
+      } else {
+        console.error('Unexpected response format:', response.data);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch user info:', error);
+      alert('사용자 정보를 불러오는 데 실패했습니다. 다시 시도해주세요.');
+    }
+  };
 
-    fetchUserInfo();
+  useEffect(() => {
+    fetchUserInfo(); // 페이지 로드시 사용자 정보 불러오기
 
-    // Handle click outside of the menu to close it
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMenu(false);
@@ -92,10 +107,15 @@ function MyPage() {
   };
 
   const handleProfileImageUpload = async () => {
-    if (!newProfileImage) return;
+    // 프로필 이미지 변경이 발생한 경우에만 업로드 시도
+    if (!newProfileImage) {
+      return; // 프로필 이미지 변경이 없는 경우 처리하지 않음
+    }
 
     const formData = new FormData();
     formData.append('profileImage', newProfileImage);
+
+    console.log('Uploading Profile Image:', newProfileImage); // 업로드할 이미지 파일 정보 출력
 
     try {
       const response = await axios.put(
@@ -108,37 +128,57 @@ function MyPage() {
           },
         }
       );
-      setUserInfo({ ...userInfo, profileImage: response.data.profileImage });
+      console.log('Profile Image Upload Response:', response.data); // 서버 응답 출력
       alert('프로필 이미지가 성공적으로 변경되었습니다.');
+
+      // 이미지 업데이트 후 사용자 정보를 다시 가져옵니다.
+      await fetchUserInfo();
     } catch (error) {
       console.error('Failed to update profile image:', error);
       alert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
-  const handleSaveChanges = () => {
-    handlePasswordChange();
-    handleProfileImageUpload();
+  const handleSaveChanges = async () => {
+    // 비밀번호가 변경된 경우에만 handlePasswordChange 호출
+    if (password !== userInfo.password) {
+      await handlePasswordChange();
+    }
+    // 프로필 이미지를 변경하려는 경우에만 handleProfileImageUpload 호출
+    if (newProfileImage || userInfo.profileImage === profileimage) {
+      await handleProfileImageUpload();
+    }
+    await fetchUserInfo(); // 변경 사항 반영 후 사용자 정보를 다시 가져오기
   };
 
   const handleDefaultImage = () => {
     setUserInfo((prev) => ({ ...prev, profileImage: profileimage }));
-    setNewProfileImage(null);
+    setNewProfileImage(profileimage); // 기본 이미지로 변경 시에도 newProfileImage에 기본 이미지 설정
     setShowMenu(false);
   };
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="flex justify-between ">
+      <div className="flex justify-between">
         <LeftBar />
         <div className="flex-1 flex flex-col items-center p-7 bg-[#E6F2FF]">
-          <div className="flex justify-start mt-[40px] ">
+          <div className="flex justify-start mt-[40px]">
             <div className="flex flex-col items-center mr-[150px] ml-1">
+              {/* 이미지가 로드될 때까지 기본 이미지를 숨기기 */}
               <img
                 src={userInfo.profileImage}
                 alt="Profile"
-                className="w-60 h-60 rounded-full border"
+                className={`w-60 h-60 rounded-full border transition-opacity duration-500 ${
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                onLoad={() => setImageLoaded(true)}
+                onError={() =>
+                  setUserInfo((prev) => ({
+                    ...prev,
+                    profileImage: profileimage,
+                  }))
+                }
               />
               <button
                 onClick={() => setShowMenu((prev) => !prev)}
@@ -149,7 +189,7 @@ function MyPage() {
               {showMenu && (
                 <div
                   ref={menuRef}
-                  className="absolute bg-white border rounded-lg  shadow-lg mt-[280px]"
+                  className="absolute bg-white border rounded-lg shadow-lg mt-[280px]"
                 >
                   <button
                     onClick={handleDefaultImage}
