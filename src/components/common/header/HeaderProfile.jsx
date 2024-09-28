@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import myProfileImg from '../../../assets/myProfile.png';
+import myProfileImg from '../../../assets/profileimage.png';
 import { useNavigate } from 'react-router-dom';
 
 export default function HeaderProfile() {
