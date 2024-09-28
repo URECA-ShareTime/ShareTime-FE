@@ -8,7 +8,7 @@ export default function LeftBar() {
   const handleActiveIdx = (idx) => setActiveIdx(activeIdx === idx ? 0 : idx);
 
   return (
-    <div className="w-[300px] h-content overflow-y-scroll overflow-x-hidden px-4 py-4 bg-primary-darkblue">
+    <div className="w-[250px] h-content overflow-y-scroll overflow-x-hidden px-4 py-4 bg-primary-darkblue">
       {/* 전체, 클래스, 스터디 데이터 props로 넘겨주기 */}
       <LeftBarAccordion
         title="All"

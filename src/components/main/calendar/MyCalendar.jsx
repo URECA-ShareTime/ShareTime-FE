@@ -9,6 +9,7 @@ import TaskModal from './TaskModal';
 
 export default function MyCalendar() {
   // JSON 데이터를 불러오고, 날짜를 Date 객체로 변환
+
   const parsedEvents = testEvents.map((event) => ({
     ...event,
     start: new Date(event.start), // 문자열을 Date 객체로 변환
