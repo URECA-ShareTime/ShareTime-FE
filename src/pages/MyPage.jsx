@@ -1,19 +1,20 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Header from '../components/common/header/Header';
-import LeftBar from '../components/common/leftBar/LeftBar'; // 올바른 경로
-import profileimage from '../assets/profileimage.png'; // 기본 프로필 이미지 불러오기
+import LeftBar from '../components/common/leftBar/LeftBar';
+import profileimage from '../assets/profileimage.png';
 
 function MyPage() {
   const [userInfo, setUserInfo] = useState({
     name: '',
     email: '',
-    profileImage: profileimage, // 초기 기본 이미지 설정
+    profileImage: '',
     className: '',
   });
   const [password, setPassword] = useState('');
   const [newProfileImage, setNewProfileImage] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -28,13 +29,13 @@ function MyPage() {
           setUserInfo({
             name: response.data.name,
             email: response.data.email,
-            profileImage: response.data.profile_picture || profileimage, // 프로필 이미지가 null일 때 기본 이미지 사용
+            profileImage: response.data.profile_picture || profileimage,
             className:
               response.data.class_id === 1
                 ? 'FrontEnd'
                 : response.data.class_id === 2
                   ? 'BackEnd'
-                  : 'Unknown', // class_id에 따라 ClassName 설정
+                  : 'Unknown',
           });
         } else {
           console.error('Unexpected response format:', response.data);
@@ -46,9 +47,19 @@ function MyPage() {
     };
 
     fetchUserInfo();
+
+    // Handle click outside of the menu to close it
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
-  // 비밀번호 수정 함수
   const handlePasswordChange = async () => {
     try {
       await axios.put(
@@ -67,49 +78,27 @@ function MyPage() {
     }
   };
 
-  // 프로필 이미지 변경 옵션 함수
-  const handleProfileImageOption = () => {
-    const userChoice = window.confirm(
-      '기본 이미지로 변경하시겠습니까? 취소를 누르면 새로운 이미지를 선택할 수 있습니다.'
-    );
-
-    if (userChoice) {
-      // 기본 이미지로 변경
-      setUserInfo((prevInfo) => ({
-        ...prevInfo,
-        profileImage: profileimage,
-      }));
-      setNewProfileImage(null);
-    } else {
-      // 새로운 이미지 선택
-      document.getElementById('profileImageInput').click();
-    }
-  };
-
-  // 프로필 이미지 변경 함수
   const handleProfileImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setNewProfileImage(file);
-      setUserInfo((prevInfo) => ({
-        ...prevInfo,
-        profileImage: URL.createObjectURL(file),
-      }));
+      const reader = new FileReader();
+      reader.onload = () => {
+        setUserInfo((prev) => ({ ...prev, profileImage: reader.result }));
+      };
+      reader.readAsDataURL(file);
+      setShowMenu(false);
     }
   };
 
-  // 프로필 이미지 업로드 함수
   const handleProfileImageUpload = async () => {
-    // 이미지가 선택되지 않았을 때 업로드 요청하지 않도록 함
-    if (!newProfileImage) {
-      return;
-    }
+    if (!newProfileImage) return;
 
     const formData = new FormData();
     formData.append('profileImage', newProfileImage);
 
     try {
-      await axios.put(
+      const response = await axios.put(
         'http://localhost:8080/user/updateProfileImage',
         formData,
         {
@@ -119,6 +108,7 @@ function MyPage() {
           },
         }
       );
+      setUserInfo({ ...userInfo, profileImage: response.data.profileImage });
       alert('프로필 이미지가 성공적으로 변경되었습니다.');
     } catch (error) {
       console.error('Failed to update profile image:', error);
@@ -126,40 +116,61 @@ function MyPage() {
     }
   };
 
-  // 모든 변경 사항을 저장하는 함수
   const handleSaveChanges = () => {
     handlePasswordChange();
     handleProfileImageUpload();
   };
+
+  const handleDefaultImage = () => {
+    setUserInfo((prev) => ({ ...prev, profileImage: profileimage }));
+    setNewProfileImage(null);
+    setShowMenu(false);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="flex justify-between">
+      <div className="flex justify-between ">
         <LeftBar />
         <div className="flex-1 flex flex-col items-center p-7 bg-[#E6F2FF]">
-          <div className="flex justify-start">
-            <div className="flex flex-col items-center mr-12 ml-1">
+          <div className="flex justify-start mt-[40px] ">
+            <div className="flex flex-col items-center mr-[150px] ml-1">
               <img
                 src={userInfo.profileImage}
                 alt="Profile"
                 className="w-60 h-60 rounded-full border"
               />
               <button
-                onClick={handleProfileImageOption}
+                onClick={() => setShowMenu((prev) => !prev)}
                 className="mt-4 text-sm text-blue-500 cursor-pointer"
               >
                 프로필 사진 선택
               </button>
-              <input
-                type="file"
-                id="profileImageInput"
-                accept="image/*"
-                onChange={handleProfileImageChange}
-                className="hidden"
-              />
+              {showMenu && (
+                <div
+                  ref={menuRef}
+                  className="absolute bg-white border rounded-lg  shadow-lg mt-[280px]"
+                >
+                  <button
+                    onClick={handleDefaultImage}
+                    className="block px-4 py-2 hover:bg-gray-100 text-left"
+                  >
+                    기본 이미지로 변경
+                  </button>
+                  <label className="block px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    새로운 이미지 선택
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfileImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              )}
             </div>
             <div className="flex flex-col items-start">
-              <h2 className="text-4xl font-bold mb-4">{userInfo.name}</h2>
+              <h2 className="text-4xl font-bold mb-10">{userInfo.name}</h2>
               <div className="mb-2">
                 <span className="text-lg font-semibold">Email:</span>{' '}
                 <span className="text-lg">{userInfo.email}</span>
@@ -170,7 +181,7 @@ function MyPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="새 비밀번호 입력" // 비밀번호 입력창에 placeholder 추가
+                  placeholder="새 비밀번호 입력"
                   className="border rounded p-1 w-60"
                 />
               </div>
@@ -179,15 +190,14 @@ function MyPage() {
                 <span className="text-lg">{userInfo.className}</span>
               </div>
               <button
-                className="bg-blue-500 text-white rounded mt-4 px-4 py-2"
+                className="bg-primary-darkblue text-white rounded mt-10 px-4 py-2 ml-[200px]"
                 onClick={handleSaveChanges}
               >
-                저장
+                프로필 수정
               </button>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
