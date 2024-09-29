@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import myProfileImg from '../../../assets/myProfile.png';
+import myProfileImg from '../../../assets/profileimage.png';
 import { useNavigate } from 'react-router-dom';
 
 export default function HeaderProfile() {
@@ -44,8 +44,9 @@ export default function HeaderProfile() {
           <button
             className="block text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => {
-              // 마이페이지로 이동하는 로직을 추가
-              navigate('/MyPage');
+              // 스터디 추가 페이지로 이동하는 로직을 추가
+              navigate('/mypage');
+
             }}
           >
             마이페이지
