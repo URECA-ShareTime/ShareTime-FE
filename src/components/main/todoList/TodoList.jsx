@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import moment from 'moment';
 
 export default function TodoList() {
   const [todos, setTodos] = useState([]);
@@ -57,7 +58,7 @@ export default function TodoList() {
       <input
             type="datetime-local"
             name="date"
-            value={newTodo.date}
+            value={moment(newTodo.date).format('YYYY-MM-DD HH:mm')}
             onChange={handleNewTodoChange}
             className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -89,7 +90,7 @@ export default function TodoList() {
           <input
             type="datetime-local"
             name="date"
-            value={newTodo.date}
+            value={moment(newTodo.date).format('YYYY-MM-DD HH:mm')}
             onChange={handleNewTodoChange}
             className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -112,7 +113,7 @@ export default function TodoList() {
               <div>
                 <p className="font-bold">{todo.title}</p>
                 <p className="text-sm text-gray-600">{todo.description}</p>
-                <p className="text-xs text-gray-500">{todo.date}</p>
+                <p className="text-xs text-gray-500">{moment(todo.date).format('YYYY-MM-DD HH:mm')}</p>
               </div>
               <div className="space-x-2">
                 <button
