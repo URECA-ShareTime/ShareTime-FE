@@ -15,6 +15,7 @@ export default function MyCalendar() {
     const getEvents = async () => {
       const allEvents = await getAllEvents();
       const parsedAllEvents = parsedEvents(allEvents);
+      console.log('Parsed Events:', parsedAllEvents);
       setEvents(parsedAllEvents);
     };
     getEvents();
@@ -25,12 +26,12 @@ export default function MyCalendar() {
     return originEvents.map((event) => ({
       ...event,
       id: event.event_id,
-      classId: event.class_id ? [event.class_id] : [], // 값이 있을 때만 배열에 추가
-    studyId: event.study_id ? [event.study_id] : [], // 값이 있을 때만 배열에 추가
-    creator: event.creator_id, 
-    groupType: event.group_type ? event.group_type.split(',') : [], // 중첩 배열 제거
-      start: new Date(event.start_date), // 문자열을 Date 객체로 변환
-      end: new Date(event.end_date), // 문자열을 Date 객체로 변환
+      classId: event.class_id ? event.class_id : [], // 값이 있을 때만 배열에 추가
+      studyId: event.study_id ? event.study_id : [], // 값이 있을 때만 배열에 추가
+      creator: event.creator_id,
+      groupType: event.group_type ? event.group_type : [], // 중첩 배열 제거
+      start: new Date(event.start_time), // 문자열을 Date 객체로 변환
+      end: new Date(event.end_time), // 문자열을 Date 객체로 변환
     }));
   };
 
@@ -45,7 +46,7 @@ export default function MyCalendar() {
     groupType: [],
     classId: [],
     studyId: [],
-    creator: 1,
+    creator: 1, //사용자의 아이디 들어가기
   });
   const [isEdit, setIsEdit] = useState(false);
 
