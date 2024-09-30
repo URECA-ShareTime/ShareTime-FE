@@ -64,6 +64,7 @@ function MyPageList() {
         }
       );
       setStudyUsers(response.data || []); // 선택된 스터디의 사용자 데이터 설정
+      console.log('Study Users:', response.data); // 스터디 유저 디버깅 출력
     } catch (error) {
       console.error('Failed to fetch study members:', error);
       alert(
@@ -80,16 +81,10 @@ function MyPageList() {
   useEffect(() => {
     if (selectedTab === 'class') {
       fetchClassUsers(); // 클래스 멤버 리스트 불러오기
-      console.log('Class Users:', classUsers); // 클래스 유저 출력
     } else if (selectedTab === 'study' && selectedStudyId) {
       fetchStudyUsers(selectedStudyId); // 선택된 스터디 멤버 리스트 불러오기
-      console.log('Study Users for Study ID', selectedStudyId, ':', studyUsers); // 선택된 스터디의 유저 출력
     }
   }, [selectedTab, selectedStudyId]);
-
-  useEffect(() => {
-    console.log('Study List:', studyList); // 스터디 리스트 출력
-  }, [studyList]);
 
   // 마우스를 클릭하여 드래그 시작
   const handleMouseDown = (e) => {
@@ -142,7 +137,7 @@ function MyPageList() {
               onClick={() => {
                 setSelectedTab('study');
                 setSelectedStudyId(study.study_id);
-                console.log('Selected study:', study); // 선택된 스터디 출력
+                console.log('Selected study:', study);
               }}
               className={`inline-block p-4 rounded-t-lg ${
                 selectedTab === 'study' && selectedStudyId === study.study_id
@@ -150,8 +145,7 @@ function MyPageList() {
                   : 'hover:text-gray-600 hover:bg-gray-50'
               }`}
             >
-              {study.study_name ? study.study_name : 'Unnamed Study'}{' '}
-              {/* 이름이 없으면 기본값으로 'Unnamed Study' 표시 */}
+              {study.study_name ? study.study_name : 'Unnamed Study'}
             </button>
           </li>
         ))}
