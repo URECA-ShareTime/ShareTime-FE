@@ -1,6 +1,4 @@
 import moment from 'moment';
-import testClass from '../../../mocks/testClass.json';
-import testStudy from '../../../mocks/testStudy.json';
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { createEvent, updateEvent, deleteEvent } from '../../../api/event';
@@ -14,6 +12,8 @@ export default function TaskModal({
   setEvents,
   isEdit,
   setIsEdit,
+  userClass,
+  userStudy,
 }) {
   const [selectedClasses, setSelectedClasses] = useState([]);
 
@@ -22,11 +22,11 @@ export default function TaskModal({
   useEffect(() => {
     if (isModalOpen && isEdit) {
       setSelectedClasses(
-        testClass.filter((group) => newEvent.classId.includes(group.id))
+        userClass.filter((group) => newEvent.classId.includes(group.id))
           .map((group) => ({ value: group.id, label: group.name }))
       );
       setSelectedStudies(
-        testStudy.filter((group) => newEvent.studyId.includes(group.id))
+        userStudy.filter((group) => newEvent.studyId.includes(group.id))
           .map((group) => ({ value: group.id, label: group.name }))
       );
     }
@@ -154,7 +154,7 @@ export default function TaskModal({
                 </label>
                 <Select
                   //isMulti
-                  options={testClass.map((group) => ({
+                  options={userClass.map((group) => ({
                     value: group.id,
                     label: group.name,
                   }))}
@@ -167,7 +167,7 @@ export default function TaskModal({
                 />
                 <Select
                   isMulti
-                  options={testStudy.map((group) => ({
+                  options={userStudy.map((group) => ({
                     value: group.id,
                     label: group.name,
                   }))}
