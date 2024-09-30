@@ -1,5 +1,5 @@
 import { Button } from '@material-tailwind/react';
-import profileimage from '/Users/HYERYEONG/Desktop/mini_prpoject/ShareTime-FE/src/assets/profileimage.png';
+import profileimage from '../../../assets/profileimage.png';
 
 export default function LeftBarProfile({ idx, item, isFollow }) {
   // 사용자 프로필 이미지가 존재할 경우 서버 URL을 앞에 추가하고, 없을 경우 기본 이미지 사용

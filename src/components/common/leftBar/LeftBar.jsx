@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import LeftBarAccordion from './LeftBarAccordion';
-import profileimage from '/Users/HYERYEONG/Desktop/mini_prpoject/ShareTime-FE/src/assets/profileimage.png';
+import profileimage from '../../../assets/profileimage.png';
 
 export default function LeftBar() {
   const [activeIdx, setActiveIdx] = useState(0);
