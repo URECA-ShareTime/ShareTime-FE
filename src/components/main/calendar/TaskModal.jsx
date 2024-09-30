@@ -46,7 +46,11 @@ export default function TaskModal({
       if (savedEvent === null) { 
         throw new Error('post failed');
       }
-      setEvents([...events, newEvent]);
+      const parsedEvent = {
+        ...savedEvent,
+        creator: savedEvent.creator_id,
+      }
+      setEvents([...events, parsedEvent]);
       setModalOpen(false);
       window.location.reload();
     } catch (error) {

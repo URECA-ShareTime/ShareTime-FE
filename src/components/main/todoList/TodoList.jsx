@@ -10,6 +10,16 @@ import {
 export default function TodoList() {
   const [todos, setTodos] = useState([]);
   const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
+  const [newTodo, setNewTodo] = useState({
+    title: '',
+    description: '',
+    date: selectedDate,
+    isCompleted: false,
+  });
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const getTodos = async () => {
@@ -30,16 +40,6 @@ export default function TodoList() {
     }));
   };
 
-  const [newTodo, setNewTodo] = useState({
-    title: '',
-    description: '',
-    date: '',
-    isCompleted: false,
-  });
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-
   const handleNewTodoChange = (e) => {
     const { name, value } = e.target;
     setNewTodo({ ...newTodo, [name]: value });
@@ -53,16 +53,36 @@ export default function TodoList() {
         if (updatedTodo === null) {
           throw new Error('put failed');
         }
+        const parsedUpdatedTodo = {
+          ...updatedTodo,
+          id: updatedTodo.todo_id,
+          title: updatedTodo.title,
+          date: moment(new Date(updatedTodo.created_at)).format('YYYY-MM-DD'),
+          isCompleted: updatedTodo.is_completed,
+        };
+
+        setTodos((prevTodos) => 
+          prevTodos.map((todo) => 
+            todo.id == parsedUpdatedTodo.id ? parsedUpdatedTodo : todo
+          )
+        );
         window.location.reload();
       } catch (error) {
         alert('할 일 수정이 실패했습니다. 다시 작성해주세요.');
       }
     } else {
       // 새로운 할 일 추가
-      const addNewTodo = await createTodo(newTodo);
-      window.location.reload();
+      const addNewTodo = await createTodo({...newTodo, date: selectedDate});
+      const parsedNewTodo = {
+        ...addNewTodo,
+        id: addNewTodo.todo_id,
+        title: addNewTodo.title,
+        date: moment(new Date(addNewTodo.created_at)).format('YYYY-MM-DD'),
+        isCompleted: addNewTodo.is_completed,
+      };
+      setTodos([...todos, parsedNewTodo]);
     }
-    setNewTodo({ title: '', description: '', date: '', isCompleted: false });
+    setNewTodo({ title: '', description: '', date: selectedDate, isCompleted: false });
     setShowForm(false);
   };
 
@@ -74,20 +94,12 @@ export default function TodoList() {
     setShowForm(true);
   };
 
-  const handleDeleteTodo = (todoId) => {
-    const deletedTodo = todos.find((todo) => todo.id === todoId);
-    if (deletedTodo) {
-      try {
-        const deletedTodo = deleteTodo(todoId);
-        if (deletedTodo === null) {
-          throw new Error('delete failed');
-        }
-        window.location.reload();
-      } catch (error) {
-        alert('할 일 삭제가 실패했습니다. 다시 시도해주세요.');
-      }
-    } else {
-      console.error('Todo not found!');
+  const handleDeleteTodo = async (todoId) => {
+    try {
+      await deleteTodo(todoId);
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== todoId));
+    } catch (error) {
+      alert('할 일 삭제가 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -96,7 +108,9 @@ export default function TodoList() {
     if (checkedTodo) {
       checkedTodo.isCompleted = !checkedTodo.isCompleted;
       updateTodo(checkedTodo);
-      window.location.reload();
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) => (todo.id === todoId ? checkedTodo : todo))
+      );
     } else {
       console.error('Todo not found!');
     }
@@ -112,6 +126,7 @@ export default function TodoList() {
 
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value); // 날짜를 변경할 때 상태 업데이트
+    setNewTodo({ ...newTodo, date: e.target.value });
   };
 
   return (
@@ -152,7 +167,7 @@ export default function TodoList() {
           />
           <button
             onClick={handleAddTodo}
-            className="w-full px-4 py-2 bg-primary-darkblue text-white rounded-md hover:bg-blue-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 bg-primary-darkblue text-white rounded-md hover:bg-blue-gray-800 focus:outline-none"
           >
             {isEditing ? '수정' : '추가'}
           </button>
