@@ -36,9 +36,6 @@ export const getAllEvents = async () => {
   };
 
 export const createEvent = async (event) => {
-  console.log('createStart: ', event.start);
-  console.log('createEnd: ', event.end);
-
   const parsedEvent = {
     title: event.title,
     description: event.description,
@@ -47,10 +44,7 @@ export const createEvent = async (event) => {
     group_type: event.groupType,
     class_id: event.classId,
     study_id: event.studyId,
-    creator_id: event.creator,
   };
-
-  console.log(parsedEvent);
 
   try {
     const response = await axios.post(
@@ -59,6 +53,7 @@ export const createEvent = async (event) => {
       {
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       }
     );
