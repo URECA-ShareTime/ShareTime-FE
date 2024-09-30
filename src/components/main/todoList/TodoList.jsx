@@ -1,15 +1,43 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import moment from 'moment';
+import {
+  createTodo,
+  getTodosByDate,
+  updateTodo,
+  deleteTodo,
+} from '../../../api/todo';
 
 export default function TodoList() {
   const [todos, setTodos] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
+
+  useEffect(() => {
+    const getTodos = async () => {
+      const allTodos = await getTodosByDate(selectedDate);
+      const parsedAllTodos = parsedTodos(allTodos);
+      setTodos(parsedAllTodos);
+    };
+    getTodos();
+  }, [selectedDate]);
+
+  const parsedTodos = (originTodos) => {
+    return originTodos.map((todo) => ({
+      ...todo,
+      id: todo.todo_id,
+      title: todo.title,
+      date: moment(new Date(todo.created_at)).format('YYYY-MM-DD'),
+      isCompleted: todo.is_completed,
+    }));
+  };
+
   const [newTodo, setNewTodo] = useState({
     title: '',
     description: '',
     date: '',
+    isCompleted: false,
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
   const handleNewTodoChange = (e) => {
@@ -17,31 +45,61 @@ export default function TodoList() {
     setNewTodo({ ...newTodo, [name]: value });
   };
 
-  const handleAddTodo = () => {
+  const handleAddTodo = async () => {
     if (isEditing) {
       // 수정 모드인 경우
-      const updatedTodos = todos.map((todo, index) =>
-        index === editingIndex ? newTodo : todo
-      );
-      setTodos(updatedTodos);
-      setIsEditing(false);
+      try {
+        const updatedTodo = await updateTodo(newTodo);
+        if (updatedTodo === null) {
+          throw new Error('put failed');
+        }
+        window.location.reload();
+      } catch (error) {
+        alert('할 일 수정이 실패했습니다. 다시 작성해주세요.');
+      }
     } else {
       // 새로운 할 일 추가
-      setTodos([...todos, newTodo]);
+      const addNewTodo = await createTodo(newTodo);
+      window.location.reload();
     }
-    setNewTodo({ title: '', description: '', date: '' });
+    setNewTodo({ title: '', description: '', date: '', isCompleted: false });
     setShowForm(false);
   };
 
-  const handleEditTodo = (index) => {
-    setNewTodo(todos[index]);
-    setEditingIndex(index);
+  const handleEditTodo = (id) => {
+    const editingTodo = todos.find((todo) => todo.id === id);
+    setNewTodo(editingTodo);
+    setEditingId(id);
     setIsEditing(true);
     setShowForm(true);
   };
 
-  const handleDeleteTodo = (index) => {
-    setTodos(todos.filter((_, i) => i !== index));
+  const handleDeleteTodo = (todoId) => {
+    const deletedTodo = todos.find((todo) => todo.id === todoId);
+    if (deletedTodo) {
+      try {
+        const deletedTodo = deleteTodo(todoId);
+        if (deletedTodo === null) {
+          throw new Error('delete failed');
+        }
+        window.location.reload();
+      } catch (error) {
+        alert('할 일 삭제가 실패했습니다. 다시 시도해주세요.');
+      }
+    } else {
+      console.error('Todo not found!');
+    }
+  };
+
+  const handleToggleComplete = (todoId) => {
+    const checkedTodo = todos.find((todo) => todo.id === todoId);
+    if (checkedTodo) {
+      checkedTodo.isCompleted = !checkedTodo.isCompleted;
+      updateTodo(checkedTodo);
+      window.location.reload();
+    } else {
+      console.error('Todo not found!');
+    }
   };
 
   const handleNewTodoClick = (e) => {
@@ -52,22 +110,28 @@ export default function TodoList() {
     setShowForm(!showForm);
   };
 
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value); // 날짜를 변경할 때 상태 업데이트
+  };
+
   return (
     <div className="w-full max-w-md p-4 bg-white shadow-md rounded-lg my-[20px] mb-[30px] mr-[20px]">
-      <div className='flex justify-between w-full max-w-md'>
+      <div className="flex justify-between w-full max-w-md items-center">
+      <div className="flex items-center">
+      <label htmlFor="date" className="font-normal text-3xl mx-2 py-2 mb-4 text-primary-darkblue">Today is</label>
       <input
-            type="datetime-local"
-            name="date"
-            value={moment(newTodo.date).format('YYYY-MM-DD HH:mm')}
-            onChange={handleNewTodoChange}
-            className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-      <button
-        onClick={handleNewTodoClick}
-        className="mb-4 w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        할 일 추가
-      </button>
+          type="date"
+          value={selectedDate}
+          onChange={handleDateChange}
+          className="w-auto mb-4 px-4 py-2 text-xl font-normal text-primary-gray focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+        <button
+          onClick={handleNewTodoClick}
+          className="mb-4 mx-2 w-auto px-3 py-1 font-bold text-2xl bg-primary-darkblue text-white rounded-md hover:bg-blue-gray-800 focus:outline-none focus:ring-2 flex items-center justify-center"
+        >
+          +
+        </button>
       </div>
       {showForm && (
         <div className="mb-4 p-4 bg-gray-100 rounded-lg">
@@ -79,46 +143,46 @@ export default function TodoList() {
             placeholder="제목"
             className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <input
-            type="text"
+          <textarea
             name="description"
             value={newTodo.description}
             onChange={handleNewTodoChange}
             placeholder="세부정보"
             className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <input
-            type="datetime-local"
-            name="date"
-            value={moment(newTodo.date).format('YYYY-MM-DD HH:mm')}
-            onChange={handleNewTodoChange}
-            className="w-full mb-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
           <button
             onClick={handleAddTodo}
-            className="w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 bg-primary-darkblue text-white rounded-md hover:bg-blue-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             {isEditing ? '수정' : '추가'}
           </button>
         </div>
       )}
 
-      <ul className="h-64 overflow-y-auto px-2 py-2 space-y-2">
-        {todos.map((todo, index) =>
-          isEditing && index === editingIndex ? null : (
+      <ul className="h-auto max-h-[700px] overflow-y-scroll px-2 py-2 space-y-2 no-scrollbar">
+        {todos.map((todo) =>
+          isEditing && todo.id === editingId ? null : (
             <li
-              key={index}
+              key={todo.id}
               className="flex justify-between items-center px-4 py-2 bg-gray-100 rounded-md shadow-sm"
             >
-              <div>
-                <p className="font-bold">{todo.title}</p>
+              <div className='flex-col'>
+                <div className="flex">
+                <input
+                  type="checkbox"
+                  checked={todo.isCompleted}
+                  onChange={() => handleToggleComplete(todo.id)}
+                  className="mr-2"
+                />
+                <p className={`font-bold ${todo.isCompleted ? 'line-through' : ''}`}>{todo.title}</p>
+                </div>
                 <p className="text-sm text-gray-600">{todo.description}</p>
-                <p className="text-xs text-gray-500">{moment(todo.date).format('YYYY-MM-DD HH:mm')}</p>
+                <p className="text-xs text-gray-500">
+                  {moment(todo.date).format('YYYY-MM-DD')}
+                </p>
               </div>
               <div className="space-x-2">
-                <button
-                  onClick={() => handleEditTodo(index)}
-                >
+                <button onClick={() => handleEditTodo(todo.id)}>
                   <svg
                     className="w-7 h-7 p-1 stroke-1 text-primary-darkblue fill-primary-darkblue hover:fill-black hover:text-black cursor-pointer"
                     aria-hidden="true"
@@ -134,9 +198,7 @@ export default function TodoList() {
                     />
                   </svg>
                 </button>
-                <button
-                  onClick={() => handleDeleteTodo(index)}
-                >
+                <button onClick={() => handleDeleteTodo(todo.id)}>
                   <svg
                     className="w-7 h-7 p-1 stroke-1 text-primary-darkblue fill-primary-darkblue hover:fill-black hover:text-black cursor-pointer"
                     aria-hidden="true"
