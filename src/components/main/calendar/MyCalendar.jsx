@@ -5,35 +5,48 @@ import { useEffect, useState } from 'react';
 import CustomToolbar from './CustomToolBar';
 import TaskModal from './TaskModal';
 import { getAllEvents } from '../../../api/event';
+import { getClass, getStudy } from '../../../api/group';
 
 export default function MyCalendar() {
   moment.locale('ko-KR');
   const localizer = momentLocalizer(moment);
   const [events, setEvents] = useState([]);
+  const [savedEvents, setSavedEvents] = useState([]);
+  const [userStudy, setUserStudy] = useState([]);
+  const [userClass, setUserClass] = useState([]);
 
   useEffect(() => {
     const getEvents = async () => {
       const allEvents = await getAllEvents();
-      const parsedAllEvents = parsedEvents(allEvents);
-      console.log('Parsed Events:', parsedAllEvents);
-      setEvents(parsedAllEvents);
+      console.log('Parsed Events:', allEvents);
+      setEvents(allEvents);
+      setSavedEvents(allEvents);
     };
+
+    const getClasses = async () => {
+      const savedClass = await getClass();
+      setUserClass([savedClass]); // 배열로 저장
+    };
+
+    const getStudies = async () => {
+      const allStudies = await getStudy();
+      if (allStudies.length === 0) {
+        setUserStudy([]);
+        return;
+      }
+      const parsedStudies = allStudies.map((group) => ({
+        id: group.study_id,
+        name: group.study_name,
+      }));
+      setUserStudy(parsedStudies);
+    };
+
     getEvents();
+    getClasses();
+    getStudies();
   }, []);
 
-  // JSON 데이터를 불러오고, 날짜를 Date 객체로 변환
-  const parsedEvents = (originEvents) => {
-    return originEvents.map((event) => ({
-      ...event,
-      id: event.event_id,
-      classId: event.class_id ? event.class_id : [], // 값이 있을 때만 배열에 추가
-      studyId: event.study_id ? event.study_id : [], // 값이 있을 때만 배열에 추가
-      creator: event.creator_id,
-      groupType: event.group_type ? event.group_type : [], // 중첩 배열 제거
-      start: new Date(event.start_time), // 문자열을 Date 객체로 변환
-      end: new Date(event.end_time), // 문자열을 Date 객체로 변환
-    }));
-  };
+
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -78,7 +91,7 @@ export default function MyCalendar() {
         views={['month', 'day']} // 월별, 일별로 변경 가능
         components={{
           toolbar: (props) => (
-            <CustomToolbar {...props} setEvents={setEvents} />
+            <CustomToolbar {...props} events={events} setEvents={setEvents} userClass={userClass} userStudy={userStudy}/>
           ),
         }}
         className="bg-white text-gray-600"
@@ -95,6 +108,8 @@ export default function MyCalendar() {
         setEvents={setEvents}
         isEdit={isEdit}
         setIsEdit={setIsEdit}
+        userClass={userClass}
+        userStudy={userStudy}
       />
     </div>
   );

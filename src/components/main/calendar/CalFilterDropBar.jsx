@@ -1,14 +1,20 @@
-import { useState } from 'react';
-//UserStudy테이블의 study_id, User의 class_id 불러오기
-import testStudy from '../../../mocks/testStudy.json';
-import testClass from '../../../mocks/testClass.json';
+import { useState, useEffect } from 'react';
 import { all } from 'axios';
+import { getAllEvents } from '../../../api/event';
 
-export default function CalFilterDropBar({ setEvents, allEvents }) {
+export default function CalFilterDropBar({ setEvents, events, userStudy, userClass }) {
   const [checkedClassList, setCheckedClassList] = useState([]); //체크된 리스트 관리
   const [checkedStudyList, setCheckedStudyList] = useState([]); //체크된 리스트 관리
   const [isChecked, setIsChecked] = useState(false); //체크박스 상태 관리
   const [isOpen, setIsOpen] = useState(false); //드롭다운 메뉴 상태 관리
+
+  useEffect(() => {
+    // 드롭다운이 열릴 때, 이전에 체크된 상태를 유지하기 위해서 상태를 초기화함
+    if (isOpen) {
+      setCheckedClassList([...checkedClassList]);
+      setCheckedStudyList([...checkedStudyList]);
+    }
+  }, [isOpen]);
 
   const handleIsOpen = () => {
     setIsOpen(!isOpen);
@@ -38,18 +44,27 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
     }
   };
 
-  const handleFilterChange = () => {
+  const handleFilterChange = async () => {
+    setEvents([]); // 기존 이벤트를 초기화
+  
+    const savedEvents = await getAllEvents();
+  
     const filteredEvents = [
       ...checkedClassList.reduce((acc, item) => {
         const itemAsNumber = Number(item);
-        return acc.concat(allEvents.filter((event) => event.classId.includes(itemAsNumber)));
+        return acc.concat(savedEvents.filter((event) => event.classId.includes(itemAsNumber)));
       }, []),
       ...checkedStudyList.reduce((acc, item) => {
         const itemAsNumber = Number(item);
-        return acc.concat(allEvents.filter((event) => event.studyId.includes(itemAsNumber)));
-      }, [])
+        return acc.concat(savedEvents.filter((event) => event.studyId.includes(itemAsNumber)));
+      }, []),
     ];
-    setEvents(filteredEvents);
+  
+    // 중복 제거: 이벤트의 고유한 ID를 사용하여 중복된 이벤트를 제거
+    const uniqueFilteredEvents = Array.from(new Map(filteredEvents.map(event => [event.id, event])).values());
+  
+    setEvents(uniqueFilteredEvents);
+
     setIsOpen(false);
   };
 
@@ -88,7 +103,7 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
             className="flex flex-col justify-center p-3 space-y-3 text-sm text-gray-700 dark:text-gray-200"
             arialabelledby="dropdownBgHoverButton"
           >
-            {testClass.map((resource) => (
+            {userClass.map((resource) => (
               <li className="p-0" key={`class-${resource.id}`}>
                 <div className="flex items-center">
                   <input
@@ -96,6 +111,7 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
                     id={`class-${resource.id}`}
                     onChange={(e) => handleClassItemChecked(e)}
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500 accent-blue-gray-700"
+                    checked={checkedClassList.includes(String(resource.id))}
                   />
                   <label
                     htmlFor={resource.name}
@@ -106,7 +122,7 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
                 </div>
               </li>
             ))}
-            {testStudy.map((resource) => (
+            {userStudy.map((resource) => (
               <li className="p-0" key={`study-${resource.id}`}>
                 <div className="flex items-center">
                   <input
@@ -114,6 +130,7 @@ export default function CalFilterDropBar({ setEvents, allEvents }) {
                     id={`study-${resource.id}`}
                     onChange={(e) => handleStudyItemChecked(e)}
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500 accent-blue-gray-700"
+                    checked={checkedStudyList.includes(String(resource.id))} 
                   />
                   <label
                     htmlFor={resource.name}
