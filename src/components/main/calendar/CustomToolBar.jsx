@@ -20,9 +20,7 @@ function MoveIcon({ direction }) {
 }
 
 export default function CustomToolbar(props) {
-  const { date } = props; // date는 현재 보고 있는 달의 첫 날
-  const { onView, view } = props; // view는 현재 보고 있는 화면
-  const { setEvents } = props;
+  const { date, onView, view, events, setEvents, userClass, userStudy } = props;
 
   const navigate = (action) => {
     // action은 'PREV', 'NEXT', 'TODAY'
@@ -67,7 +65,7 @@ export default function CustomToolbar(props) {
           {view === 'month' ? 'Day' : 'Month'}
         </Button>
       </div>
-      <CalFilterDropBar setEvents={setEvents} allEvents={testEvents} />
+      <CalFilterDropBar setEvents={setEvents} events={events} userClass={userClass} userStudy={userStudy}/>
     </div>
   );
 }
