@@ -3,6 +3,7 @@ import testClass from '../../../mocks/testClass.json';
 import testStudy from '../../../mocks/testStudy.json';
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
+import { createEvent, updateEvent, deleteEvent } from '../../../api/event';
 
 export default function TaskModal({
   isModalOpen,
@@ -14,13 +15,9 @@ export default function TaskModal({
   isEdit,
   setIsEdit,
 }) {
-  const [selectedClasses, setSelectedClasses] = useState(
-    // testClass.filter((group) => newEvent.classId.includes(group.Id)) //
-  );
+  const [selectedClasses, setSelectedClasses] = useState([]);
 
-  const [selectedStudies, setSelectedStudies] = useState(
-    // testStudy.filter((group) => newEvent.studyId.includes(group.Id))
-  );
+  const [selectedStudies, setSelectedStudies] = useState([]);
 
   useEffect(() => {
     if (isModalOpen && isEdit) {
@@ -43,9 +40,18 @@ export default function TaskModal({
     });
   };
 
-  const handleSaveEvent = () => {
-    setEvents([...events, newEvent]);
-    setModalOpen(false);
+  const handleSaveEvent = async() => {
+    try {
+      const savedEvent = await createEvent(newEvent);
+      if (savedEvent === null) { 
+        throw new Error('post failed');
+      }
+      setEvents([...events, newEvent]);
+      setModalOpen(false);
+      window.location.reload();
+    } catch (error) {
+      alert('이벤트 생성이 실패했습니다. 다시 작성해주세요.');
+    }
   };
 
   const handleClassChange = (selected) => {
@@ -67,15 +73,34 @@ export default function TaskModal({
   };
 
   //Task 수정 처리
-  const handleUpdateEvent = () => {
-    //수정할 이벤트를 id로 찾아서 newEvent 값으로 수정한 배열 리턴
-    const updatedEvents = events.map((event) =>
-      event.id === newEvent.id ? newEvent : event
-    );
-    setEvents(updatedEvents);
-    setIsEdit(false);
-    setModalOpen(false);
+  const handleUpdateEvent = async() => {
+    try {
+      const updatedDBEvent = await updateEvent(newEvent);
+      if (updatedDBEvent === null) { 
+        throw new Error('put failed');
+      }
+      setIsEdit(false);
+      setModalOpen(false);
+      window.location.reload();
+    } catch (error) {
+      alert('이벤트 수정이 실패했습니다. 다시 작성해주세요.');
+    } 
   };
+
+  const handleDeleteEvent = async() => {
+    try {
+      const deletedEvent = await deleteEvent(newEvent.id);
+      if (deletedEvent === null) { 
+        throw new Error('delete failed');
+      }
+      setEvents(events.filter((event) => event.id !== newEvent.id));
+      setIsEdit(false);
+      setModalOpen(false);
+      window.location.reload();
+    } catch (error) {
+      alert('이벤트 삭제가 실패했습니다. 다시 작성해주세요.');
+    }
+  }
 
   return (
     <>
@@ -100,7 +125,7 @@ export default function TaskModal({
                   </label>
                   <input
                     type="datetime-local"
-                    name="start"
+                    name="start" 
                     value={moment(newEvent.start).format('YYYY-MM-DDTHH:mm')}
                     onChange={handleInputChange}
                     className="w-auto border-none text-sm"
@@ -176,6 +201,12 @@ export default function TaskModal({
                 className="bg-primary-gray hover:bg-gray-800 text-primary-white font-normal py-1 px-3 rounded-md mr-2 text-sm"
               >
                 {isEdit ? 'Edit' : 'Submit'}
+              </button>
+              <button
+                onClick={handleDeleteEvent}
+                className="bg-primary-gray hover:bg-gray-800 text-primary-white font-normal py-1 px-3 rounded-md mr-2 text-sm"
+              >
+                delete
               </button>
             </div>
           </div>
