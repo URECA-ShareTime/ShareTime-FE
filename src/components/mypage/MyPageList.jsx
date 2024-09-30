@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import profileimage from '/Users/HYERYEONG/Desktop/mini_prpoject/ShareTime-FE/src/assets/profileimage.png';
+import profileimage from '../../assets/profileimage.png';
 
 function MyPageList() {
   const [classUsers, setClassUsers] = useState([]); // 클래스 사용자 리스트
