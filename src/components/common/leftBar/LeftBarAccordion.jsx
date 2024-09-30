@@ -1,24 +1,10 @@
-import { useState } from 'react';
+import React from 'react';
 import {
-    Accordion,
-    AccordionHeader,
-    AccordionBody,
-  } from "@material-tailwind/react";
-import testImg from '../../../assets/profileimage.png';
+  Accordion,
+  AccordionHeader,
+  AccordionBody,
+} from '@material-tailwind/react';
 import LeftBarProfile from './LeftBarProfile';
-
-const TEST_LIST = [
-  { name: 'ongheong', profile: testImg, isFollow: true },
-  { name: 'ongheong', profile: testImg, isFollow: false },
-  { name: 'ongheong', profile: testImg, isFollow: true },
-  { name: 'ongheong', profile: testImg, isFollow: false },
-  { name: 'ongheong', profile: testImg, isFollow: true },
-  { name: 'ongheong', profile: testImg, isFollow: false },
-  { name: 'ongheong', profile: testImg, isFollow: true },
-  { name: 'ongheong', profile: testImg, isFollow: false },
-  { name: 'ongheong', profile: testImg, isFollow: true },
-  { name: 'ongheong', profile: testImg, isFollow: false },
-];
 
 function AccordionIcon({ id, open }) {
   return (
@@ -46,22 +32,26 @@ export default function LeftBarAccordion({
   title,
   id,
   handleActiveIdx,
+  userList,
 }) {
   return (
     <>
       <Accordion
         open={activeIdx === id}
         icon={<AccordionIcon id={id} open={activeIdx} />}
-        className='w-full'
+        className="w-full"
       >
-          <AccordionHeader onClick={() => handleActiveIdx(id)} className='text-base border-b-white text-white'>
-            {title}
-          </AccordionHeader>
-          <AccordionBody className="max-h-[400px] overflow-y-scroll ">
-            {TEST_LIST.map((item, idx, isFollow) => (
-                <LeftBarProfile key={idx} item={item} isFollow={item.isFollow}/>
-            ))}
-          </AccordionBody>
+        <AccordionHeader
+          onClick={() => handleActiveIdx(id)}
+          className="text-base border-b-white text-white"
+        >
+          {title}
+        </AccordionHeader>
+        <AccordionBody className="max-h-[400px] overflow-y-scroll">
+          {userList.map((item, idx) => (
+            <LeftBarProfile key={idx} item={item} isFollow={item.isFollow} />
+          ))}
+        </AccordionBody>
       </Accordion>
     </>
   );

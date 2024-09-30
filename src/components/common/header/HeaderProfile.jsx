@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import myProfileImg from '../../../assets/profileimage.png';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function HeaderProfile() {
   const navigate = useNavigate(); // 페이지 이동을 위한 navigate 함수 생성
-
+  const [userProfileImg, setUserProfileImg] = useState(myProfileImg); // 기본 이미지를 초기 상태로 설정
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -28,13 +29,40 @@ export default function HeaderProfile() {
     };
   }, []);
 
+  // 사용자 정보를 가져오는 함수
+  const fetchUserProfile = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/user/info', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+
+      // 프로필 이미지 URL을 설정. 없으면 기본 이미지 사용
+      const profileImageUrl = response.data.profile_picture
+        ? `http://localhost:8080${response.data.profile_picture}`
+        : myProfileImg; // 없으면 기본 이미지 사용
+
+      setUserProfileImg(profileImageUrl);
+    } catch (error) {
+      console.error('Failed to fetch user profile image:', error);
+      setUserProfileImg(myProfileImg); // 오류 발생 시 기본 이미지 설정
+    }
+  };
+
+  // 컴포넌트가 마운트될 때 사용자 정보를 불러옴
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
   return (
     <div className="relative">
       <img
-        src={myProfileImg}
+        src={userProfileImg || myProfileImg} // 프로필 이미지가 없으면 기본 이미지 사용
         alt="profileImg"
-        className="w-[40px] h-[40px] cursor-pointer"
+        className="w-[40px] h-[40px] cursor-pointer rounded-full" // 이미지 스타일
         onClick={toggleMenu}
+        onError={() => setUserProfileImg(myProfileImg)} // 이미지 로드 실패 시 기본 이미지로 변경
       />
       {isMenuOpen && (
         <div
@@ -44,9 +72,7 @@ export default function HeaderProfile() {
           <button
             className="block text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => {
-              // 스터디 추가 페이지로 이동하는 로직을 추가
-              navigate('/mypage');
-
+              navigate('/mypage'); // 마이페이지로 이동
             }}
           >
             마이페이지
@@ -54,8 +80,7 @@ export default function HeaderProfile() {
           <button
             className="block text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => {
-              // 스터디 추가 페이지로 이동하는 로직을 추가
-              navigate('/studycreate');
+              navigate('/studycreate'); // 스터디 추가 페이지로 이동
             }}
           >
             스터디 추가
